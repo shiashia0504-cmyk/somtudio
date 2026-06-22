@@ -20,8 +20,8 @@
      ===================================================== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
+  const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
     ? null
     : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1000,6 +1000,66 @@
     min-height:16px;
   }
 
+  /* ---- Wishlist ---- */
+  .wish-tag-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .wish-tag-btn{
+    flex:1;
+    min-width:110px;
+    border:1px solid var(--line);
+    background:var(--beige);
+    color:var(--green-deep);
+    font-size:11.5px;
+    font-weight:700;
+    padding:9px 6px;
+    border-radius:9px;
+    cursor:pointer;
+  }
+  .wish-tag-btn.selected{
+    background:var(--green-deep);
+    color:var(--beige-card);
+    border-color:var(--green-deep);
+  }
+  .wish-list{display:flex;flex-direction:column;gap:9px;}
+  .wish-item{
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:13px 14px;
+    background:var(--beige-card);
+  }
+  .wish-item.cooling{
+    filter:grayscale(0.5);
+    opacity:0.6;
+  }
+  .wish-item.reflected{
+    opacity:0.5;
+    filter:grayscale(0.7);
+  }
+  .wi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+  .wi-name{font-weight:700;font-size:13.5px;color:var(--green-ink);}
+  .wi-price{font-family:'Noto Serif KR',serif;font-weight:900;font-size:15px;color:var(--green-deep);white-space:nowrap;}
+  .wi-meta-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:9px;}
+  .wi-tag{
+    font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:6px;
+    background:rgba(46,90,68,0.08);color:var(--green-deep);
+  }
+  .wi-status{font-size:10.5px;color:var(--muted);}
+  .wi-link{font-size:10.5px;color:var(--green-deep);text-decoration:underline;}
+  .wi-btn-row{display:flex;gap:7px;}
+  .wi-btn-row button{
+    flex:1;
+    border:none;
+    border-radius:9px;
+    padding:9px 0;
+    font-size:11.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .wi-buy-btn{background:var(--mustard);color:var(--green-ink);}
+  .wi-buy-btn:disabled{background:var(--sage);color:#fff;opacity:0.6;cursor:not-allowed;}
+  .wi-delete-btn{background:transparent;border:1px solid var(--line) !important;color:var(--muted);}
+  .wi-delete-btn:hover{color:var(--terracotta);border-color:var(--terracotta) !important;}
+  .wi-purchased-badge{font-size:10.5px;font-weight:700;color:var(--green-deep);}
+
   .weekend-manage{
     background:var(--beige-card);
     border:1px solid var(--line);
@@ -1217,6 +1277,18 @@
     color:var(--green-ink);
   }
   .budget-block .bb-sub{font-size:11px;color:var(--muted);}
+  .carry-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+  .carry-line .carry-positive{color:var(--green-deep);font-weight:700;}
+  .carry-line .carry-negative{color:var(--terracotta);font-weight:700;}
+
   .cheat-banner{
     margin-top:12px;
     background:rgba(227,168,87,0.18);
@@ -1508,6 +1580,7 @@
     <button class="tab-btn active" data-view="calendar">📅 일정 & 저축은행</button>
     <button class="tab-btn" data-view="wallet">💰 가계부</button>
     <button class="tab-btn" data-view="diet">🏃 다이어트</button>
+    <button class="tab-btn" data-view="wishlist">🛒 장바구니</button>
     <button class="tab-btn" data-view="weekend">🌿 주말 아카이브</button>
   </div>
 
@@ -1639,6 +1712,7 @@
             <span class="bb-sub">/ <span id="moneyBudget">10,000</span>원</span>
           </div>
         </div>
+        <div class="carry-line" id="carryLine"></div>
         <div class="cheat-banner" id="cheatBanner">
           🔓 합법적 치트키 발동 — 시발비용 예산 +15,000원 합산됨
         </div>
@@ -1722,6 +1796,45 @@
 
     </div>
   </div><!-- /view-diet -->
+
+  <div class="view" id="view-wishlist">
+    <div class="page-head">
+      <h1>장바구니</h1>
+      <span class="week-range" id="bufferLabel">주말 버퍼 0원</span>
+    </div>
+
+    <div class="wallet-layout">
+
+      <div class="log-card" id="wishlistAddCard">
+        <div class="log-section-title">+ 새 아이템</div>
+        <input type="text" id="wishItemName" placeholder="물품 이름">
+        <div class="amount-row" style="margin-top:8px;">
+          <input type="number" id="wishItemPrice" placeholder="가격" inputmode="numeric">
+          <span class="amount-unit">원</span>
+        </div>
+        <input type="text" id="wishItemUrl" placeholder="쇼핑몰 URL (선택)" style="margin-top:8px;">
+
+        <div class="log-section-title" style="margin-top:14px;">필수성 태그 (하나 필수)</div>
+        <div class="wish-tag-row" id="wishTagRow">
+          <button class="wish-tag-btn" data-tag="urgent">🚨 당장 필요</button>
+          <button class="wish-tag-btn" data-tag="quality">💫 삶의 질 상승</button>
+          <button class="wish-tag-btn" data-tag="dopamine">🧸 단순 도파민 소장용</button>
+        </div>
+
+        <button class="confirm-add-btn" id="addWishBtn" style="margin-top:12px;">장바구니에 담기</button>
+      </div>
+
+      <div class="log-card">
+        <div class="period-section-head">
+          <div class="log-section-title" style="margin-bottom:0;">담아둔 아이템</div>
+          <button class="archive-toggle" id="reflectToggleBtn">🪞 소비반성 보관함 (<span id="reflectCount">0</span>)</button>
+        </div>
+        <div class="wish-list" id="wishList"></div>
+        <div class="wish-list" id="reflectList" style="display:none;"></div>
+      </div>
+
+    </div>
+  </div><!-- /view-wishlist -->
 
   <div class="view" id="view-weekend">
     <div class="page-head">
@@ -1954,7 +2067,7 @@
     if(!isLive()) return;
 
     const [projectsRows, historiesRows, tasksRows, taskHistRows, bankRows, financeRows,
-           dietRows, exLogRows, exPlanRows, weekendRows, dailyRows, categoryRows] = await Promise.all([
+           dietRows, exLogRows, exPlanRows, weekendRows, dailyRows, categoryRows, wishRows] = await Promise.all([
       dbSelectAll('projects'),
       isLive() ? supabaseClient.from('project_histories').select('*, projects!inner(user_id)').eq('projects.user_id', currentUserId).then(r=>r.data||[]) : [],
       dbSelectAll('todo_tasks'),
@@ -1967,6 +2080,7 @@
       dbSelectAll('weekend_archive_items'),
       dbSelectAll('daily_logs'),
       dbSelectAll('categories'),
+      dbSelectAll('wishlists'),
     ]);
 
     periodEvents = projectsRows.map(p=>({
@@ -1993,7 +2107,7 @@
     }));
 
     moneyLogs = financeRows.map(f=>({
-      id:f.id, t:new Date(f.created_at||f.date).getTime(), major:financeMajorFromDb[f.major]||'normal',
+      id:f.id, t:new Date(f.created_at||f.date).getTime(), date:f.date, major:financeMajorFromDb[f.major]||'normal',
       sub:f.sub_category, label:`${f.major==='시발비용'?'💸 시발비용':'🛒 일반'} · ${f.sub_category||''}`, amount:f.amount
     }));
 
@@ -2032,9 +2146,14 @@
     if(typeof renderSchedSubRow==='function') renderSchedSubRow();
     if(typeof renderSubCats==='function') renderSubCats();
 
+    wishlistItems = wishRows.map(w=>({
+      id:w.id, item_name:w.item_name, price:w.price, url_link:w.url_link,
+      priority_level:w.priority_level, status:w.status, created_at:w.created_at
+    }));
+
     dataLoaded = true;
     renderMonthGrid(); renderPeriodEvents(); renderBank(); renderWallet();
-    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab();
+    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab(); renderWishlist();
     checkDayGates();
   }
 
@@ -2139,9 +2258,7 @@
   document.getElementById('weekendNextBtn').addEventListener('click', ()=>{
     document.getElementById('weekendStepSystem').style.display = 'none';
     document.getElementById('weekendStepVault').style.display = 'block';
-    const weekdayBudgetTotal = BASE_MONEY * 5; // 평일 5일치 기본 예산
-    const spent = moneyLogs.reduce((sum,l)=>sum+l.amount, 0);
-    const savings = Math.max(0, weekdayBudgetTotal - spent);
+    const savings = weekendBonusPool(appDayKey(testNow));
     document.getElementById('vaultMsg').textContent =
       `이번 주 평일 절약 보너스가 주말 예산으로 이월되었습니다. 오늘 죄책감 없이 사용하세요!`;
     setTimeout(()=>{
@@ -2907,6 +3024,66 @@
   let dietLogs = [];
   let loggingSkipped = false;
 
+  // ---- 평일 연쇄 예산(이월) 계산 ----
+  function getMonday(dateKey){
+    const d = new Date(dateKey + 'T00:00:00');
+    const dow = (d.getDay() + 6) % 7; // 월=0 ... 일=6
+    d.setDate(d.getDate() - dow);
+    return dateKeyOf(d);
+  }
+  function addDaysKey(dateKey, n){
+    const d = new Date(dateKey + 'T00:00:00');
+    d.setDate(d.getDate() + n);
+    return dateKeyOf(d);
+  }
+  function isWeekdayKey(dateKey){
+    const dow = new Date(dateKey + 'T00:00:00').getDay();
+    return dow >= 1 && dow <= 5;
+  }
+  function dayBudgetFor(dateKey){
+    const ev = eveningRecord[dateKey];
+    return BASE_MONEY + (ev !== undefined && ev <= 20 ? 15000 : 0);
+  }
+  function daySpentFor(dateKey){
+    return moneyLogs.filter(l=>l.date===dateKey).reduce((s,l)=>s+l.amount, 0);
+  }
+  // 같은 주의 월요일부터 uptoDateKey까지 평일만 순서대로 예산-지출을 누적해서
+  // uptoDateKey 마감 시점의 이월 잔액(+면 절약, -면 초과)을 구함
+  function computeCarry(uptoDateKey){
+    const monday = getMonday(uptoDateKey);
+    let carry = 0;
+    let cursor = monday;
+    while(cursor <= uptoDateKey){
+      if(isWeekdayKey(cursor)){
+        const available = dayBudgetFor(cursor) + carry;
+        carry = available - daySpentFor(cursor);
+      }
+      cursor = addDaysKey(cursor, 1);
+    }
+    return carry;
+  }
+  function getFridayOfWeek(dateKey){
+    return addDaysKey(getMonday(dateKey), 4);
+  }
+  // 오늘 들어오기 전까지(전날까지) 누적된 이월액. 월요일은 항상 0(새 주는 깨끗하게 시작)
+  function carryInForToday(dateKey){
+    const dow = new Date(dateKey + 'T00:00:00').getDay();
+    if(dow === 1 || dow === 0 || dow === 6) return 0; // 월/토/일은 평일 이월과 무관
+    return computeCarry(addDaysKey(dateKey, -1));
+  }
+  // 주말 보너스 잔액(그 주 금요일 마감 시점의 +잔액만, 0 이하면 0)
+  function weekendBonusPool(dateKey){
+    return Math.max(0, computeCarry(getFridayOfWeek(dateKey)));
+  }
+  // 주말 동안 그 보너스에서 이미 쓴 금액(이번 주말 토/일 지출)
+  function weekendSpentSoFar(dateKey){
+    const monday = getMonday(dateKey);
+    const sat = addDaysKey(monday, 5), sun = addDaysKey(monday, 6);
+    let total = daySpentFor(sat);
+    if(dateKey === sun) total += daySpentFor(sun);
+    return total;
+  }
+
   // ---- Exercise plan & log (다이어트 탭) ----
   let exercisePlans = {
     100: [{id:'demo-100-1', label:'헬스장 가서 웨이트 1시간'}, {id:'demo-100-2', label:'수영 30분'}],
@@ -3036,15 +3213,48 @@
   renderExerciseToday();
   renderExerciseFeed();
 
+  function getBudgetSnapshot(dateKey){
+    const isWeekend = isWeekendDayKey(dateKey);
+    let carryIn, dayBudget, available, moneyUsed;
+    if(isWeekend){
+      const pool = weekendBonusPool(dateKey);
+      const dow = new Date(dateKey+'T00:00:00').getDay();
+      const satKey = addDaysKey(getMonday(dateKey), 5);
+      carryIn = (dow===0) ? (pool - daySpentFor(satKey)) : pool;
+      dayBudget = 0;
+      available = carryIn;
+      moneyUsed = daySpentFor(dateKey);
+    } else {
+      carryIn = carryInForToday(dateKey);
+      dayBudget = dayBudgetFor(dateKey);
+      available = dayBudget + carryIn;
+      moneyUsed = daySpentFor(dateKey);
+    }
+    const remaining = available - moneyUsed;
+    return { isWeekend, carryIn, dayBudget, available, moneyUsed, remaining };
+  }
+
   function renderWallet(){
+    const todayKey = appDayKey(testNow);
+    const snap = getBudgetSnapshot(todayKey);
+    const isWeekend = snap.isWeekend;
     const lowBattery = eveningBattery <= 20;
-    const moneyBudget = BASE_MONEY + (lowBattery ? 15000 : 0);
-    const moneyUsed = moneyLogs.reduce((sum,l)=>sum+l.amount,0);
+    const carryIn = snap.carryIn, available = snap.available, moneyUsed = snap.moneyUsed;
 
     document.getElementById('moneyUsed').textContent = moneyUsed.toLocaleString();
-    document.getElementById('moneyBudget').textContent = moneyBudget.toLocaleString();
-    document.getElementById('cheatBanner').classList.toggle('show', lowBattery);
-    document.getElementById('pledgeBanner').classList.toggle('hide', lowBattery);
+    document.getElementById('moneyBudget').textContent = available.toLocaleString();
+    document.getElementById('cheatBanner').classList.toggle('show', !isWeekend && lowBattery);
+    document.getElementById('pledgeBanner').classList.toggle('hide', !isWeekend && lowBattery);
+
+    const carryLine = document.getElementById('carryLine');
+    if(isWeekend){
+      carryLine.innerHTML = `<span>🌿 주말 보너스 잔액</span><span class="${carryIn>=0?'carry-positive':'carry-negative'}">${carryIn.toLocaleString()}원</span>`;
+    } else {
+      const carrySign = carryIn > 0 ? '+'+carryIn.toLocaleString() : carryIn.toLocaleString();
+      carryLine.innerHTML = carryIn===0
+        ? `<span>전날 이월액</span><span>없음</span>`
+        : `<span>${carryIn>0?'전날 절약분 이월':'전날 초과분 차감'}</span><span class="${carryIn>=0?'carry-positive':'carry-negative'}">${carrySign}원</span>`;
+    }
 
     // 지출 피드 (퇴근 에너지에 영향 받음 — 쉬어가기 가능)
     const moneyFeed = document.getElementById('logFeed');
@@ -3085,7 +3295,144 @@
         dietFeed.appendChild(el);
       });
     }
+    if(typeof renderWishlist === 'function') renderWishlist();
   }
+
+  // ---- 장바구니 (48시간 냉각 + 주말버퍼 연동) ----
+  const COOLING_MS = 1000 * 60 * 60 * 48; // 172,800,000ms = 48시간
+  const wishTagLabel = {urgent:'🚨 당장 필요', quality:'💫 삶의 질 상승', dopamine:'🧸 단순 도파민 소장용'};
+  let wishlistItems = [];
+  let selectedWishTag = null;
+
+  function formatRemainingHours(ms){
+    const h = Math.ceil(ms / (1000*60*60));
+    return h <= 1 ? '1시간 미만' : `${h}시간`;
+  }
+
+  function renderWishlist(){
+    const buffer = Math.max(0, getBudgetSnapshot(appDayKey(testNow)).remaining);
+    document.getElementById('bufferLabel').textContent = `주말 버퍼 ${buffer.toLocaleString()}원`;
+
+    const active = wishlistItems.filter(w=>w.status!=='reflected_delete');
+    const reflected = wishlistItems.filter(w=>w.status==='reflected_delete');
+    document.getElementById('reflectCount').textContent = reflected.length;
+
+    const list = document.getElementById('wishList');
+    list.innerHTML = '';
+    if(active.length===0){
+      list.innerHTML = '<div class="bank-empty">아직 담은 아이템이 없어요.</div>';
+    } else {
+      active.forEach(w=>renderWishItem(w, list, false));
+    }
+
+    const reflectList = document.getElementById('reflectList');
+    reflectList.innerHTML = '';
+    if(reflected.length===0){
+      reflectList.innerHTML = '<div class="bank-empty">소비반성 보관함이 비어있어요.</div>';
+    } else {
+      reflected.forEach(w=>renderWishItem(w, reflectList, true));
+    }
+  }
+
+  function renderWishItem(w, container, isReflected){
+    const elapsed = Date.now() - new Date(w.created_at).getTime();
+    const cooling = !isReflected && w.status==='active' && elapsed < COOLING_MS;
+    const purchased = w.status==='purchased';
+    const buffer = Math.max(0, getBudgetSnapshot(appDayKey(testNow)).remaining);
+    const canAfford = w.price <= buffer;
+
+    const el = document.createElement('div');
+    el.className = 'wish-item' + (cooling ? ' cooling' : '') + (isReflected ? ' reflected' : '');
+    el.innerHTML = `
+      <div class="wi-top">
+        <span class="wi-name">${w.item_name}</span>
+        <span class="wi-price">${w.price.toLocaleString()}원</span>
+      </div>
+      <div class="wi-meta-row">
+        <span class="wi-tag">${wishTagLabel[w.priority_level]}</span>
+        <span class="wi-status">${
+          isReflected ? '🪞 소비반성 처리됨'
+          : purchased ? '✅ 구매완료'
+          : cooling ? `48시간 냉각 중 · ${formatRemainingHours(COOLING_MS - elapsed)} 남음`
+          : canAfford ? '구매가능'
+          : '구매가능 · 버퍼 부족'
+        }</span>
+        ${w.url_link ? `<a class="wi-link" href="${w.url_link}" target="_blank" rel="noopener">보러가기</a>` : ''}
+      </div>
+      ${isReflected || purchased ? '' : `
+        <div class="wi-btn-row">
+          <button class="wi-buy-btn" ${(cooling || !canAfford) ? 'disabled' : ''}>구매완료</button>
+          <button class="wi-delete-btn">소비반성 삭제</button>
+        </div>
+      `}
+    `;
+
+    if(!isReflected && !purchased){
+      const buyBtn = el.querySelector('.wi-buy-btn');
+      buyBtn.addEventListener('click', async ()=>{
+        if(cooling || !canAfford) return;
+        w.status = 'purchased';
+        renderWallet();
+        await dbUpdate('wishlists', w.id, { status:'purchased' });
+      });
+      const delBtn = el.querySelector('.wi-delete-btn');
+      delBtn.addEventListener('click', async ()=>{
+        w.status = 'reflected_delete';
+        renderWallet();
+        await dbUpdate('wishlists', w.id, { status:'reflected_delete' });
+      });
+    }
+
+    container.appendChild(el);
+  }
+
+  document.querySelectorAll('#wishTagRow .wish-tag-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#wishTagRow .wish-tag-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedWishTag = btn.dataset.tag;
+    });
+  });
+
+  document.getElementById('addWishBtn').addEventListener('click', async ()=>{
+    const name = document.getElementById('wishItemName').value.trim();
+    const price = Number(document.getElementById('wishItemPrice').value);
+    const url = document.getElementById('wishItemUrl').value.trim();
+    if(!name){ alert('물품 이름을 적어주세요'); return; }
+    if(!price || price<=0){ alert('가격을 입력해주세요'); return; }
+    if(!selectedWishTag){ alert('필수성 태그를 하나 골라주세요 (당장 필요 / 삶의 질 상승 / 단순 도파민 소장용)'); return; }
+
+    const item = {
+      id:Date.now(), item_name:name, price, url_link:url||null,
+      priority_level:selectedWishTag, status:'active', created_at:new Date().toISOString()
+    };
+    wishlistItems.unshift(item);
+    document.getElementById('wishItemName').value='';
+    document.getElementById('wishItemPrice').value='';
+    document.getElementById('wishItemUrl').value='';
+    document.querySelectorAll('#wishTagRow .wish-tag-btn').forEach(b=>b.classList.remove('selected'));
+    selectedWishTag = null;
+    renderWallet();
+
+    const saved = await dbInsert('wishlists', {
+      user_id:currentUserId, item_name:name, price, url_link:url||null,
+      priority_level:item.priority_level, status:'active'
+    });
+    if(saved){ item.id = saved.id; item.created_at = saved.created_at; renderWallet(); }
+  });
+
+  document.getElementById('reflectToggleBtn').addEventListener('click', ()=>{
+    const wishList = document.getElementById('wishList');
+    const reflectList = document.getElementById('reflectList');
+    const showingReflect = reflectList.style.display !== 'none';
+    if(showingReflect){
+      reflectList.style.display = 'none';
+      wishList.style.display = 'flex';
+    } else {
+      wishList.style.display = 'none';
+      reflectList.style.display = 'flex';
+    }
+  });
 
   document.querySelectorAll('#eveningBbOptions .bb-stamp').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
@@ -3166,8 +3513,9 @@
     if(!selectedMajor){ alert('대분류(시발비용/일반)를 먼저 골라주세요'); return; }
     if(!amount || amount<=0){ alert('금액을 입력해주세요'); return; }
     loggingSkipped = false;
+    const logDate = appDayKey(testNow);
     const log = {
-      kind:'money', t:Date.now(), major:selectedMajor, sub:selectedSub,
+      kind:'money', t:Date.now(), date:logDate, major:selectedMajor, sub:selectedSub,
       label:`${majorLabel[selectedMajor]} · ${selectedSub}`, amount
     };
     moneyLogs.push(log);
@@ -3175,7 +3523,7 @@
     renderWallet();
     const saved = await dbInsert('finance_logs', {
       user_id:currentUserId, amount, major:financeMajorToDb[selectedMajor]||'일반',
-      sub_category:selectedSub, date:todayStr
+      sub_category:selectedSub, date:logDate
     });
     if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderWallet(); }
   });
@@ -3230,6 +3578,7 @@
     document.getElementById('testDateInput').value = dateKeyOf(testNow);
   })();
   checkDayGates();
+  setInterval(()=>{ if(typeof renderWishlist==='function') renderWishlist(); }, 60000);
 </script>
 
 </body>
