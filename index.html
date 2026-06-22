@@ -22,9 +22,9 @@
 <script>
   const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
-  const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
+  const supabaseClient = (SUPABASE_URL.startsWith('https://dtszsdajbfdcpjajajfg.supabase.co'))
     ? null
-    : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    : window.supabase.createClient(https://dtszsdajbfdcpjajajfg.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8);
   // 사용 예시: await supabaseClient.from('finance_logs').insert({...});
 </script>
 <style>
