@@ -14,17 +14,17 @@
      2) Project Settings → API 에서 URL / anon key 복사
      3) 아래 두 값을 본인 값으로 교체
      4) 지금은 클라이언트만 만들어둔 상태이고, 실제 데이터
-        저장 로직(아래 <script> 안의 schedules, moneyLogs 등)은
+        저장 로직(아래 본문 스크립트 안의 schedules, moneyLogs 등)은
         아직 메모리 변수 그대로입니다. 필요한 부분부터 하나씩
         supabase.from('테이블명').select()/.insert() 로 바꿔보세요.
      ===================================================== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
-  const supabaseClient = (SUPABASE_URL.startsWith('https://dtszsdajbfdcpjajajfg.supabase.co'))
+  const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
     ? null
-    : window.supabase.createClient(https://dtszsdajbfdcpjajajfg.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8);
+    : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   // 사용 예시: await supabaseClient.from('finance_logs').insert({...});
 </script>
 <style>
@@ -730,6 +730,74 @@
     cursor:pointer;
   }
 
+  .auth-overlay{
+    position:fixed;
+    inset:0;
+    background:var(--beige);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .auth-overlay.hide{display:none;}
+  .auth-card{
+    width:100%;
+    max-width:360px;
+    background:var(--beige-card);
+    border-radius:22px;
+    border:1px solid var(--line);
+    box-shadow:0 24px 60px -20px rgba(46,90,68,0.3);
+    padding:30px 26px;
+  }
+  .auth-card .eyebrow{
+    display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.12em;
+    color:var(--green-deep);font-weight:600;margin-bottom:16px;
+  }
+  .auth-card .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--terracotta);}
+  .auth-card .eyebrow .rule{flex:1;height:1px;background:var(--line);}
+  .auth-card h1{
+    font-family:'Noto Serif KR',serif;font-weight:900;font-size:24px;
+    margin:0 0 6px;color:var(--green-ink);
+  }
+  .auth-card .sub{font-size:12.5px;color:#6B7368;margin:0 0 20px;}
+  .auth-card input{
+    width:100%;
+    border:1px solid var(--line);
+    background:var(--beige);
+    border-radius:10px;
+    padding:11px 13px;
+    font-size:13px;
+    font-family:'Pretendard',sans-serif;
+    margin-bottom:10px;
+  }
+  .auth-error{
+    font-size:11.5px;
+    color:var(--terracotta);
+    min-height:16px;
+    margin-bottom:6px;
+  }
+  .auth-card .confirm-add-btn{width:100%;margin-top:4px;}
+  .auth-switch-btn{
+    width:100%;
+    border:none;
+    background:none;
+    color:var(--green-deep);
+    font-size:11.5px;
+    font-weight:600;
+    padding:12px 0 0;
+    cursor:pointer;
+    text-decoration:underline;
+  }
+  .user-badge{
+    font-size:11px;
+    color:var(--muted);
+    font-weight:600;
+    margin-right:auto;
+    cursor:pointer;
+  }
+  .user-badge:hover{color:var(--terracotta);}
+
   .morning-overlay{
     position:fixed;
     inset:0;
@@ -1414,8 +1482,29 @@
 </head>
 <body>
 
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="eyebrow">
+      <span class="dot"></span>
+      <span id="authModeLabel">로그인</span>
+      <span class="rule"></span>
+    </div>
+    <h1>사서함</h1>
+    <p class="sub">내 데이터를 안전하게 저장하려면 로그인이 필요해요.</p>
+
+    <input type="email" id="authEmail" placeholder="이메일">
+    <input type="password" id="authPassword" placeholder="비밀번호 (6자 이상)">
+
+    <div class="auth-error" id="authError"></div>
+
+    <button class="confirm-add-btn" id="authSubmitBtn">로그인</button>
+    <button class="auth-switch-btn" id="authSwitchBtn">계정이 없으신가요? 회원가입</button>
+  </div>
+</div>
+
 <div class="app">
   <div class="tab-bar">
+    <span class="user-badge" id="userBadge" style="display:none;"></span>
     <button class="tab-btn active" data-view="calendar">📅 일정 & 저축은행</button>
     <button class="tab-btn" data-view="wallet">💰 가계부</button>
     <button class="tab-btn" data-view="diet">🏃 다이어트</button>
@@ -1741,6 +1830,216 @@
 </div>
 
 <script>
+  // ---- Auth (Supabase 로그인 게이트) ----
+  let currentUserId = null;
+  let authMode = 'login'; // 'login' | 'signup'
+
+  function showAuthError(msg){
+    document.getElementById('authError').textContent = msg || '';
+  }
+
+  async function initAuthGate(){
+    const overlay = document.getElementById('authOverlay');
+    const badge = document.getElementById('userBadge');
+
+    if(!supabaseClient){
+      // Supabase 키가 아직 placeholder 상태 → 로그인 없이 데모 모드로 실행
+      overlay.classList.add('hide');
+      badge.style.display = 'none';
+      return;
+    }
+
+    const { data } = await supabaseClient.auth.getSession();
+    applySession(data.session);
+
+    supabaseClient.auth.onAuthStateChange((_event, session)=>{
+      applySession(session);
+    });
+  }
+
+  function applySession(session){
+    const overlay = document.getElementById('authOverlay');
+    const badge = document.getElementById('userBadge');
+    if(session && session.user){
+      currentUserId = session.user.id;
+      overlay.classList.add('hide');
+      badge.style.display = 'inline';
+      badge.textContent = `${session.user.email} · 로그아웃`;
+      loadAllData();
+    } else {
+      currentUserId = null;
+      overlay.classList.remove('hide');
+      badge.style.display = 'none';
+    }
+  }
+
+  document.getElementById('authSwitchBtn').addEventListener('click', ()=>{
+    authMode = authMode==='login' ? 'signup' : 'login';
+    document.getElementById('authModeLabel').textContent = authMode==='login' ? '로그인' : '회원가입';
+    document.getElementById('authSubmitBtn').textContent = authMode==='login' ? '로그인' : '회원가입';
+    document.getElementById('authSwitchBtn').textContent = authMode==='login'
+      ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인';
+    showAuthError('');
+  });
+
+  document.getElementById('authSubmitBtn').addEventListener('click', async ()=>{
+    if(!supabaseClient){ showAuthError('Supabase 키가 아직 설정되지 않았어요.'); return; }
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    if(!email || !password){ showAuthError('이메일과 비밀번호를 입력해주세요.'); return; }
+    showAuthError('');
+
+    if(authMode==='login'){
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if(error) showAuthError(error.message);
+    } else {
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+      if(error){
+        showAuthError(error.message);
+      } else {
+        showAuthError('가입 확인 이메일을 보냈어요. 메일함을 확인해주세요!');
+      }
+    }
+  });
+
+  document.getElementById('userBadge').addEventListener('click', async ()=>{
+    if(!supabaseClient) return;
+    if(confirm('로그아웃하시겠어요?')){
+      await supabaseClient.auth.signOut();
+    }
+  });
+
+  // ---- Supabase DB 공용 헬퍼 ----
+  function isLive(){ return !!(supabaseClient && currentUserId); }
+
+  async function dbInsert(table, row){
+    if(!isLive()) return null;
+    const { data, error } = await supabaseClient.from(table).insert(row).select().single();
+    if(error){ console.error('[insert]', table, error); return null; }
+    return data;
+  }
+  async function dbUpdate(table, id, patch){
+    if(!isLive()) return null;
+    const { data, error } = await supabaseClient.from(table).update(patch).eq('id', id).select().single();
+    if(error){ console.error('[update]', table, error); return null; }
+    return data;
+  }
+  async function dbDelete(table, id){
+    if(!isLive()) return;
+    const { error } = await supabaseClient.from(table).delete().eq('id', id);
+    if(error) console.error('[delete]', table, error);
+  }
+  async function dbUpsert(table, row, conflictCols){
+    if(!isLive()) return null;
+    const { data, error } = await supabaseClient.from(table).upsert(row, {onConflict: conflictCols}).select().single();
+    if(error){ console.error('[upsert]', table, error); return null; }
+    return data;
+  }
+  async function dbSelectAll(table){
+    if(!isLive()) return [];
+    const { data, error } = await supabaseClient.from(table).select('*').eq('user_id', currentUserId);
+    if(error){ console.error('[select]', table, error); return []; }
+    return data || [];
+  }
+  function remapId(arr, field, oldId, newId){
+    arr.forEach(o=>{ if(o[field]===oldId) o[field]=newId; });
+  }
+
+  const financeMajorToDb = {shibal:'시발비용', normal:'일반'};
+  const financeMajorFromDb = {'시발비용':'shibal', '일반':'normal', '앱테크수입':'normal'};
+
+  let dataLoaded = false;
+
+  async function loadAllData(){
+    if(!isLive()) return;
+
+    const [projectsRows, historiesRows, tasksRows, taskHistRows, bankRows, financeRows,
+           dietRows, exLogRows, exPlanRows, weekendRows, dailyRows, categoryRows] = await Promise.all([
+      dbSelectAll('projects'),
+      isLive() ? supabaseClient.from('project_histories').select('*, projects!inner(user_id)').eq('projects.user_id', currentUserId).then(r=>r.data||[]) : [],
+      dbSelectAll('todo_tasks'),
+      isLive() ? supabaseClient.from('task_histories').select('*, todo_tasks!inner(user_id)').eq('todo_tasks.user_id', currentUserId).then(r=>r.data||[]) : [],
+      dbSelectAll('dopamine_bank'),
+      dbSelectAll('finance_logs'),
+      dbSelectAll('diet_logs'),
+      dbSelectAll('exercise_logs'),
+      dbSelectAll('exercise_plans'),
+      dbSelectAll('weekend_archive_items'),
+      dbSelectAll('daily_logs'),
+      dbSelectAll('categories'),
+    ]);
+
+    periodEvents = projectsRows.map(p=>({
+      id:p.id, title:p.project_name, startDate:p.start_date, endDate:p.end_date,
+      major:p.major, sub:p.sub_category, archived:!!p.archived,
+      history: historiesRows.filter(h=>h.project_id===p.id).map(h=>({
+        id:h.id, stage:h.phase_name, date:(h.created_at||'').slice(5,10).replace('-','.'), note:h.content
+      }))
+    }));
+
+    schedules = tasksRows.map(t=>{
+      const ownHist = taskHistRows.filter(h=>h.task_id===t.id).map(h=>({
+        id:h.id, stage:h.phase_name, date:(h.created_at||'').slice(5,10).replace('-','.'), note:h.content
+      }));
+      return {
+        id:t.id, date:t.date, title:t.title, energy:t.energy_level||'mid',
+        major:t.major, sub:t.sub_category, projectId:t.project_id,
+        history: ownHist.length ? ownHist : [{stage:'등록', date:(t.date||'').slice(5,10).replace('-','.'), note:'불러온 일정'}]
+      };
+    });
+
+    bankItems = bankRows.map(b=>({
+      id:b.id, label:b.label, meta:b.meta, energy:b.energy_level, recurring:!!b.recurring
+    }));
+
+    moneyLogs = financeRows.map(f=>({
+      id:f.id, t:new Date(f.created_at||f.date).getTime(), major:financeMajorFromDb[f.major]||'normal',
+      sub:f.sub_category, label:`${f.major==='시발비용'?'💸 시발비용':'🛒 일반'} · ${f.sub_category||''}`, amount:f.amount
+    }));
+
+    dietLogs = dietRows.map(d=>({
+      id:d.id, t:new Date(d.created_at||d.date).getTime(),
+      label: d.category==='clean'?'🥗 클린 식단': d.category==='heavy'?'🍕 도파민헤비':'🍚 급식일반',
+      amount:d.kcal
+    }));
+
+    exerciseLogs = exLogRows.map(e=>({
+      id:e.id, t:new Date(e.created_at||Date.now()).getTime(), energy:e.energy_tier, label:e.label
+    }));
+
+    exercisePlans = {100:[],80:[],50:[],20:[]};
+    exPlanRows.forEach(p=>{ if(exercisePlans[p.energy_tier]) exercisePlans[p.energy_tier].push({id:p.id, label:p.label}); });
+
+    weekendArchiveItems = weekendRows.map(w=>({id:w.id, icon:w.icon, label:w.label}));
+
+    morningRecord = {}; eveningRecord = {};
+    dailyRows.forEach(d=>{
+      if(d.morning_energy!==null) morningRecord[d.date] = d.morning_energy;
+      if(d.evening_energy!==null) eveningRecord[d.date] = d.evening_energy;
+    });
+
+    categoryRows.forEach(c=>{
+      if(c.domain==='schedule' && categories[c.major] && !categories[c.major].includes(c.label)){
+        categories[c.major].unshift(c.label);
+      }
+      if(c.domain==='finance'){
+        const key = financeMajorFromDb[c.major] || c.major;
+        if(subCategories[key] && !subCategories[key].includes(c.label)){
+          subCategories[key].unshift(c.label);
+        }
+      }
+    });
+    if(typeof renderSchedSubRow==='function') renderSchedSubRow();
+    if(typeof renderSubCats==='function') renderSubCats();
+
+    dataLoaded = true;
+    renderMonthGrid(); renderPeriodEvents(); renderBank(); renderWallet();
+    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab();
+    checkDayGates();
+  }
+
+  initAuthGate();
+
   // ---- Day cycle (새벽 5시 = 하루의 시작) ----
   const DAY_START_HOUR = 5;
   const EVENING_HOUR = 17;
@@ -1898,21 +2197,25 @@
       const row = document.createElement('div');
       row.className = 'wm-item';
       row.innerHTML = `<span>${item.icon} ${item.label}</span><button data-id="${item.id}">✕</button>`;
-      row.querySelector('button').addEventListener('click', ()=>{
+      row.querySelector('button').addEventListener('click', async ()=>{
         weekendArchiveItems = weekendArchiveItems.filter(i=>i.id!==item.id);
         renderWeekendTab();
+        await dbDelete('weekend_archive_items', item.id);
       });
       manageList.appendChild(row);
     });
   }
 
-  document.getElementById('addWeekendCardBtn').addEventListener('click', ()=>{
+  document.getElementById('addWeekendCardBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('weekendCardInput');
     const val = input.value.trim();
     if(!val) return;
-    weekendArchiveItems.push({id:Date.now(), icon:'✨', label:val});
+    const item = {id:Date.now(), icon:'✨', label:val};
+    weekendArchiveItems.push(item);
     input.value = '';
     renderWeekendTab();
+    const saved = await dbInsert('weekend_archive_items', { user_id:currentUserId, icon:'✨', label:val });
+    if(saved){ item.id = saved.id; renderWeekendTab(); }
   });
   document.getElementById('weekendCardInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('addWeekendCardBtn').click();
@@ -1939,11 +2242,15 @@
   document.getElementById('morningCoffeeBtn').addEventListener('click', (e)=>{
     e.target.textContent = '☕ 좋아요, 마셨어요';
   });
-  document.getElementById('morningConfirmBtn').addEventListener('click', ()=>{
+  document.getElementById('morningConfirmBtn').addEventListener('click', async ()=>{
     if(pendingMorningPct===null) return;
-    morningRecord[appDayKey(testNow)] = pendingMorningPct;
+    const dayKey = appDayKey(testNow);
+    morningRecord[dayKey] = pendingMorningPct;
     document.getElementById('morningOverlay').classList.remove('open');
     checkDayGates();
+    await dbUpsert('daily_logs', {
+      user_id:currentUserId, date:dayKey, morning_energy:pendingMorningPct
+    }, 'user_id,date');
   });
 
   document.getElementById('testTimeBtn').addEventListener('click', ()=>{
@@ -2060,12 +2367,19 @@
         card.addEventListener('click', ()=>openDetail(s.id, 'schedule'));
         if(s.fromBank){
           const returnBtn = card.querySelector('.return-btn');
-          returnBtn.addEventListener('click', (e)=>{
+          returnBtn.addEventListener('click', async (e)=>{
             e.stopPropagation();
-            bankItems.push({id:Date.now(), label:s.bankLabel, meta:s.bankMeta, history:s.history, recurring:s.recurring, energy:s.energy});
+            const item = {id:Date.now(), label:s.bankLabel, meta:s.bankMeta, history:s.history, recurring:s.recurring, energy:s.energy};
+            bankItems.push(item);
             schedules = schedules.filter(x=>x.id!==s.id);
             renderBank();
             renderMonthGrid();
+            await dbDelete('todo_tasks', s.id);
+            const saved = await dbInsert('dopamine_bank', {
+              user_id:currentUserId, label:s.bankLabel, meta:s.bankMeta,
+              energy_level:s.energy||'mid', recurring:!!s.recurring
+            });
+            if(saved){ item.id = saved.id; renderBank(); }
           });
         }
         cell.appendChild(card);
@@ -2144,19 +2458,26 @@
         <button data-id="${item.id}">꺼내기</button>
       `;
       const btn = el.querySelector('button');
-      btn.addEventListener('click', ()=>{
+      btn.addEventListener('click', async ()=>{
         const restoredHistory = item.history && item.history.length
           ? item.history
           : [{stage:'오늘로 꺼냄', date:'06.22', note:item.meta}];
-        schedules.push({
+        const sched = {
           id:Date.now(), date:todayStr, title:item.label,
           major:'work', sub: item.recurring ? '도서관운영' : '기타',
           history:restoredHistory,
           fromBank:true, bankLabel:item.label, bankMeta:item.meta, recurring:item.recurring, energy:item.energy
-        });
+        };
+        schedules.push(sched);
         bankItems = bankItems.filter(b=>b.id!==item.id);
         renderBank();
         renderMonthGrid();
+        await dbDelete('dopamine_bank', item.id);
+        const saved = await dbInsert('todo_tasks', {
+          user_id:currentUserId, title:item.label, energy_level:item.energy||'mid',
+          major:'work', sub_category: sched.sub, date:todayStr
+        });
+        if(saved){ sched.id = saved.id; renderMonthGrid(); }
       });
       list.appendChild(el);
     });
@@ -2227,7 +2548,7 @@
     });
   }
 
-  document.getElementById('addLinkedBtn').addEventListener('click', ()=>{
+  document.getElementById('addLinkedBtn').addEventListener('click', async ()=>{
     if(activeId===null || activeKind!=='period') return;
     const period = findItem(activeId, 'period');
     const dateInput = document.getElementById('linkedDateInput');
@@ -2235,34 +2556,42 @@
     const date = dateInput.value || todayStr;
     const title = titleInput.value.trim();
     if(!title) return;
-    schedules.push({
+    const sched = {
       id:Date.now(), date, title, energy:'mid', major:period.major, sub:period.sub,
       projectId:period.id,
       history:[{stage:'일지', date:`${date.slice(5,7)}.${date.slice(8,10)}`, note:'프로젝트 진행 기록'}]
-    });
+    };
+    schedules.push(sched);
     dateInput.value=''; titleInput.value='';
     renderLinkedList(period);
     renderMonthGrid();
     renderPeriodEvents();
     const [y,m] = date.split('-').map(Number);
     if(!isNaN(y)){ viewYear=y; viewMonth=m-1; renderMonthGrid(); }
+    const saved = await dbInsert('todo_tasks', {
+      user_id:currentUserId, title, energy_level:'mid', major:period.major,
+      sub_category:period.sub, project_id:period.id, date
+    });
+    if(saved){ sched.id = saved.id; renderMonthGrid(); renderLinkedList(period); }
   });
 
-  document.getElementById('archiveBtn').addEventListener('click', ()=>{
+  document.getElementById('archiveBtn').addEventListener('click', async ()=>{
     if(activeId===null) return;
     const period = findItem(activeId, 'period');
     period.archived = true;
     closeDetail();
     renderPeriodEvents();
     renderArchiveList();
+    await dbUpdate('projects', period.id, { archived:true, status:'이관' });
   });
-  document.getElementById('restoreBtn').addEventListener('click', ()=>{
+  document.getElementById('restoreBtn').addEventListener('click', async ()=>{
     if(activeId===null) return;
     const period = findItem(activeId, 'period');
     period.archived = false;
     closeDetail();
     renderPeriodEvents();
     renderArchiveList();
+    await dbUpdate('projects', period.id, { archived:false, status:'진행' });
   });
 
   document.getElementById('archiveToggleBtn').addEventListener('click', ()=>{
@@ -2289,22 +2618,29 @@
   document.getElementById('overlay').addEventListener('click', closeDetail);
   document.getElementById('detailClose').addEventListener('click', closeDetail);
 
-  document.getElementById('addStageBtn').addEventListener('click', ()=>{
+  document.getElementById('addStageBtn').addEventListener('click', async ()=>{
     if(activeId===null) return;
     const nameInput = document.getElementById('stageNameInput');
     const noteInput = document.getElementById('stageNoteInput');
     if(!nameInput.value.trim()) return;
     const s = findItem(activeId, activeKind);
     const d = new Date();
+    const stageName = nameInput.value.trim();
+    const noteVal = noteInput.value.trim() || '메모 없음';
     s.history.push({
-      stage:nameInput.value.trim(),
+      stage:stageName,
       date:`${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`,
-      note:noteInput.value.trim() || '메모 없음'
+      note:noteVal
     });
     nameInput.value=''; noteInput.value='';
     openDetail(activeId, activeKind);
     renderMonthGrid();
     renderPeriodEvents();
+    if(activeKind==='period'){
+      await dbInsert('project_histories', { project_id:s.id, phase_name:stageName, content:noteVal });
+    } else {
+      await dbInsert('task_histories', { task_id:s.id, phase_name:stageName, content:noteVal });
+    }
   });
 
   document.getElementById('prevMonthBtn').addEventListener('click', ()=>{
@@ -2390,7 +2726,7 @@
     });
   });
 
-  document.getElementById('schedAddSubBtn').addEventListener('click', ()=>{
+  document.getElementById('schedAddSubBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('schedNewSubInput');
     const val = input.value.trim();
     if(!val) return;
@@ -2399,36 +2735,60 @@
     input.value = '';
     document.getElementById('schedAddSubRow').style.display = 'none';
     renderSchedSubRow();
+    await dbInsert('categories', { user_id:currentUserId, domain:'schedule', major:schedMajor, label:val });
   });
   document.getElementById('schedNewSubInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('schedAddSubBtn').click();
   });
 
-  document.getElementById('addScheduleBtn').addEventListener('click', ()=>{
+  document.getElementById('addScheduleBtn').addEventListener('click', async ()=>{
     const title = document.getElementById('newSchedTitle').value.trim();
     if(!title){ alert('일정 제목을 적어주세요'); return; }
 
     if(schedType==='single'){
       const date = document.getElementById('newSchedDate').value;
       if(!date){ alert('날짜를 선택해주세요'); return; }
-      schedules.push({
+      const sched = {
         id:Date.now(), date, title, energy:'mid', major:schedMajor, sub:schedSub,
         projectId:schedProjectId,
         history:[{stage:'등록', date:`${date.slice(5,7)}.${date.slice(8,10)}`, note:'일정 생성됨'}]
-      });
+      };
+      schedules.push(sched);
       const [y,m] = date.split('-').map(Number);
       viewYear = y; viewMonth = m-1;
       renderMonthGrid();
       renderPeriodEvents();
+      const saved = await dbInsert('todo_tasks', {
+        user_id:currentUserId, title, energy_level:'mid', major:schedMajor, sub_category:schedSub,
+        project_id: (typeof schedProjectId==='number' || schedProjectId===null) ? null : schedProjectId,
+        date
+      });
+      if(saved){
+        const oldId = sched.id;
+        sched.id = saved.id;
+        renderMonthGrid();
+      }
     } else {
       const start = document.getElementById('newSchedStart').value;
       const end = document.getElementById('newSchedEnd').value;
       if(!start || !end){ alert('시작일과 종료일을 모두 선택해주세요'); return; }
-      periodEvents.push({
+      const period = {
         id:Date.now(), title, startDate:start, endDate:end, major:schedMajor, sub:schedSub, archived:false,
         history:[{stage:'등록', date:`${start.slice(5,7)}.${start.slice(8,10)}`, note:'기간형 일정 생성됨'}]
-      });
+      };
+      periodEvents.push(period);
       renderPeriodEvents();
+      const saved = await dbInsert('projects', {
+        user_id:currentUserId, project_name:title, major:schedMajor, sub_category:schedSub,
+        start_date:start, end_date:end, status:'준비', archived:false
+      });
+      if(saved){
+        const oldId = period.id;
+        period.id = saved.id;
+        remapId(schedules, 'projectId', oldId, saved.id);
+        await dbInsert('project_histories', { project_id:saved.id, phase_name:'등록', content:'기간형 일정 생성됨' });
+        renderPeriodEvents();
+      }
     }
 
     document.getElementById('newSchedTitle').value = '';
@@ -2439,13 +2799,18 @@
     schedProjectId = null;
   });
 
-  document.getElementById('addBankBtn').addEventListener('click', ()=>{
+  document.getElementById('addBankBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('newBankInput');
     const val = input.value.trim();
     if(!val) return;
-    bankItems.push({id:Date.now(), label:val, meta:'직접 추가한 아이디어', energy:newItemEnergy});
+    const item = {id:Date.now(), label:val, meta:'직접 추가한 아이디어', energy:newItemEnergy};
+    bankItems.push(item);
     input.value = '';
     renderBank();
+    const saved = await dbInsert('dopamine_bank', {
+      user_id:currentUserId, label:val, meta:'직접 추가한 아이디어', energy_level:newItemEnergy, recurring:false
+    });
+    if(saved){ item.id = saved.id; renderBank(); }
   });
   document.getElementById('newBankInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('addBankBtn').click();
@@ -2544,10 +2909,10 @@
 
   // ---- Exercise plan & log (다이어트 탭) ----
   let exercisePlans = {
-    100: ['헬스장 가서 웨이트 1시간', '수영 30분'],
-    80: ['홈트 30분', '동네 한바퀴 걷기'],
-    50: ['스트레칭 15분', '계단 10분만 오르기'],
-    20: ['누워서 다리 스트레칭 5분', '심호흡 1분'],
+    100: [{id:'demo-100-1', label:'헬스장 가서 웨이트 1시간'}, {id:'demo-100-2', label:'수영 30분'}],
+    80: [{id:'demo-80-1', label:'홈트 30분'}, {id:'demo-80-2', label:'동네 한바퀴 걷기'}],
+    50: [{id:'demo-50-1', label:'스트레칭 15분'}, {id:'demo-50-2', label:'계단 10분만 오르기'}],
+    20: [{id:'demo-20-1', label:'누워서 다리 스트레칭 5분'}, {id:'demo-20-2', label:'심호흡 1분'}],
   };
   let exerciseLogs = [];
 
@@ -2569,10 +2934,15 @@
     const row = document.getElementById('exerciseSuggestRow');
     (exercisePlans[tier] || []).forEach(item=>{
       const btn = document.createElement('button');
-      btn.textContent = '✅ ' + item;
-      btn.addEventListener('click', ()=>{
-        exerciseLogs.push({t:Date.now(), energy:tier, label:item});
+      btn.textContent = '✅ ' + item.label;
+      btn.addEventListener('click', async ()=>{
+        const log = {t:Date.now(), energy:tier, label:item.label};
+        exerciseLogs.push(log);
         renderExerciseFeed();
+        const saved = await dbInsert('exercise_logs', {
+          user_id:currentUserId, date:todayStr, energy_tier:tier, label:item.label
+        });
+        if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderExerciseFeed(); }
       });
       row.appendChild(btn);
     });
@@ -2603,14 +2973,15 @@
       card.className = 'plan-tier';
       card.dataset.pct = tier;
       card.innerHTML = `<div class="plan-tier-head">${energyIconByPct(tier)} ${tier}%</div>`;
-      exercisePlans[tier].forEach((item, idx)=>{
+      exercisePlans[tier].forEach(item=>{
         const row = document.createElement('div');
         row.className = 'plan-item';
-        row.innerHTML = `<span>${item}</span><button data-idx="${idx}">✕</button>`;
-        row.querySelector('button').addEventListener('click', ()=>{
-          exercisePlans[tier].splice(idx,1);
+        row.innerHTML = `<span>${item.label}</span><button>✕</button>`;
+        row.querySelector('button').addEventListener('click', async ()=>{
+          exercisePlans[tier] = exercisePlans[tier].filter(i=>i!==item);
           renderPlanGrid();
           renderExerciseToday();
+          if(typeof item.id === 'string' && !item.id.startsWith('demo-') ) await dbDelete('exercise_plans', item.id);
         });
         card.appendChild(row);
       });
@@ -2618,13 +2989,16 @@
       addRow.className = 'plan-add-row';
       addRow.innerHTML = `<input type="text" placeholder="계획 추가"><button>추가</button>`;
       const input = addRow.querySelector('input');
-      addRow.querySelector('button').addEventListener('click', ()=>{
+      addRow.querySelector('button').addEventListener('click', async ()=>{
         const val = input.value.trim();
         if(!val) return;
-        exercisePlans[tier].push(val);
+        const item = {id:Date.now(), label:val};
+        exercisePlans[tier].push(item);
         input.value = '';
         renderPlanGrid();
         renderExerciseToday();
+        const saved = await dbInsert('exercise_plans', {user_id:currentUserId, energy_tier:tier, label:val});
+        if(saved) item.id = saved.id;
       });
       input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addRow.querySelector('button').click(); });
       card.appendChild(addRow);
@@ -2639,15 +3013,20 @@
     return '☁️';
   }
 
-  document.getElementById('addExerciseBtn').addEventListener('click', ()=>{
+  document.getElementById('addExerciseBtn').addEventListener('click', async ()=>{
     const tier = todayEveningEnergy();
     if(tier===undefined){ alert('퇴근 에너지를 먼저 골라주세요 (가계부 탭)'); return; }
     const input = document.getElementById('exerciseNoteInput');
     const val = input.value.trim();
     if(!val) return;
-    exerciseLogs.push({t:Date.now(), energy:tier, label:val});
+    const log = {t:Date.now(), energy:tier, label:val};
+    exerciseLogs.push(log);
     input.value = '';
     renderExerciseFeed();
+    const saved = await dbInsert('exercise_logs', {
+      user_id:currentUserId, date:todayStr, energy_tier:tier, label:val
+    });
+    if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderExerciseFeed(); }
   });
   document.getElementById('exerciseNoteInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('addExerciseBtn').click();
@@ -2709,15 +3088,19 @@
   }
 
   document.querySelectorAll('#eveningBbOptions .bb-stamp').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', async ()=>{
       document.querySelectorAll('#eveningBbOptions .bb-stamp').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
       eveningBattery = Number(btn.dataset.pct);
-      eveningRecord[appDayKey(testNow)] = eveningBattery;
+      const dayKey = appDayKey(testNow);
+      eveningRecord[dayKey] = eveningBattery;
       document.getElementById('eveningBanner').classList.remove('show');
       document.getElementById('eveningBatteryBar').classList.remove('needs-attention');
       renderWallet();
       renderExerciseToday();
+      await dbUpsert('daily_logs', {
+        user_id:currentUserId, date:dayKey, evening_energy:eveningBattery
+      }, 'user_id,date');
     });
   });
 
@@ -2748,7 +3131,7 @@
     });
   }
 
-  document.getElementById('addSubcatBtn').addEventListener('click', ()=>{
+  document.getElementById('addSubcatBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('newSubcatInput');
     const val = input.value.trim();
     if(!val || !selectedMajor) return;
@@ -2759,6 +3142,9 @@
     input.value = '';
     document.getElementById('addSubcatRow').style.display = 'none';
     renderSubCats();
+    await dbInsert('categories', {
+      user_id:currentUserId, domain:'finance', major:financeMajorToDb[selectedMajor]||selectedMajor, label:val
+    });
   });
   document.getElementById('newSubcatInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('addSubcatBtn').click();
@@ -2774,18 +3160,24 @@
     });
   });
 
-  document.getElementById('addMoneyBtn').addEventListener('click', ()=>{
+  document.getElementById('addMoneyBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('moneyAmountInput');
     const amount = Number(input.value);
     if(!selectedMajor){ alert('대분류(시발비용/일반)를 먼저 골라주세요'); return; }
     if(!amount || amount<=0){ alert('금액을 입력해주세요'); return; }
     loggingSkipped = false;
-    moneyLogs.push({
+    const log = {
       kind:'money', t:Date.now(), major:selectedMajor, sub:selectedSub,
       label:`${majorLabel[selectedMajor]} · ${selectedSub}`, amount
-    });
+    };
+    moneyLogs.push(log);
     input.value = '';
     renderWallet();
+    const saved = await dbInsert('finance_logs', {
+      user_id:currentUserId, amount, major:financeMajorToDb[selectedMajor]||'일반',
+      sub_category:selectedSub, date:todayStr
+    });
+    if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderWallet(); }
   });
   document.getElementById('moneyAmountInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('addMoneyBtn').click();
@@ -2801,15 +3193,20 @@
     });
   });
 
-  document.getElementById('addDietBtn').addEventListener('click', ()=>{
+  document.getElementById('addDietBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('kcalAmountInput');
     const amount = Number(input.value);
     if(!selectedDietCat){ alert('식단 분류를 먼저 골라주세요'); return; }
     if(!amount || amount<=0){ alert('칼로리를 입력해주세요'); return; }
     loggingSkipped = false;
-    dietLogs.push({kind:'diet', t:Date.now(), label:dietLabels[selectedDietCat], amount});
+    const log = {kind:'diet', t:Date.now(), label:dietLabels[selectedDietCat], amount};
+    dietLogs.push(log);
     input.value = '';
     renderWallet();
+    const saved = await dbInsert('diet_logs', {
+      user_id:currentUserId, date:todayStr, category:selectedDietCat, kcal:amount
+    });
+    if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderWallet(); }
   });
   document.getElementById('kcalAmountInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('addDietBtn').click();
