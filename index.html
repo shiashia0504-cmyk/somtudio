@@ -20,8 +20,8 @@
      ===================================================== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
+  const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
     ? null
     : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1976,9 +1976,9 @@
       <span class="week-range" id="eveningStatusLabel">일상 레이어</span>
     </div>
 
-    <div class="evening-drawer-note" id="eveningDrawerNote">
-      <span id="drawerNoteText">📦 학교 업무 투두는 지금 서랍 속에 넣어뒀어요.</span>
-      <button id="openDrawerBtn">서랍에서 꺼내보기</button>
+    <div class="evening-drawer-note drawer-note-box">
+      <span class="drawer-note-text">📦 학교 업무 투두는 지금 서랍 속에 넣어뒀어요.</span>
+      <button class="drawer-toggle-btn">서랍에서 꺼내보기</button>
     </div>
 
     <div class="wallet-layout">
@@ -1995,6 +1995,8 @@
       <div class="log-card" id="homeMissionCard">
         <div class="log-section-title">🏠 홈 스위트 홈 <span class="all-day-note">오늘 퇴근 에너지에 맞춰 달라져요</span></div>
         <div id="homeMissionBox"></div>
+        <button class="archive-toggle" id="homeMissionEditToggle" style="margin-top:12px;">✏️ 미션 직접 편집하기</button>
+        <div class="plan-tier-grid" id="homeMissionEditGrid" style="display:none;margin-top:10px;"></div>
       </div>
 
       <button class="add-sched-toggle" id="weekendPeekBtn">⏳ 다가오는 주말 아카이브 엿보기</button>
@@ -2159,6 +2161,11 @@
     </div>
 
     <div class="weekend-note" id="weekendNote"></div>
+
+    <div class="evening-drawer-note drawer-note-box">
+      <span class="drawer-note-text">📦 학교 업무 투두는 지금 서랍 속에 넣어뒀어요.</span>
+      <button class="drawer-toggle-btn">서랍에서 꺼내보기</button>
+    </div>
 
     <div class="weekend-grid" id="weekendGrid"></div>
     <div class="weekend-toast" id="weekendToast"></div>
@@ -2391,7 +2398,7 @@
     if(!isLive()) return;
 
     const [projectsRows, historiesRows, tasksRows, taskHistRows, bankRows, financeRows,
-           dietRows, exLogRows, exPlanRows, weekendRows, dailyRows, categoryRows, wishRows] = await Promise.all([
+           dietRows, exLogRows, exPlanRows, weekendRows, dailyRows, categoryRows, wishRows, homeMissionRows] = await Promise.all([
       dbSelectAll('projects'),
       isLive() ? supabaseClient.from('project_histories').select('*, projects!inner(user_id)').eq('projects.user_id', currentUserId).then(r=>r.data||[]) : [],
       dbSelectAll('todo_tasks'),
@@ -2405,6 +2412,7 @@
       dbSelectAll('daily_logs'),
       dbSelectAll('categories'),
       dbSelectAll('wishlists'),
+      dbSelectAll('home_missions'),
     ]);
 
     periodEvents = projectsRows.map(p=>({
@@ -2475,9 +2483,12 @@
       priority_level:w.priority_level, status:w.status, created_at:w.created_at
     }));
 
+    homeMissions = {100:[], 80:[], 50:[], 20:[]};
+    homeMissionRows.forEach(m=>{ if(homeMissions[m.energy_tier]) homeMissions[m.energy_tier].push({id:m.id, label:m.label}); });
+
     dataLoaded = true;
     renderMonthGrid(); renderPeriodEvents(); renderBank(); renderWallet();
-    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab(); renderWishlist();
+    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab(); renderWishlist(); renderHomeMission();
     checkDayGates();
   }
 
@@ -2532,17 +2543,21 @@
     lastSeenDayKey = dayKey;
 
     const eveningModeActive = !weekend && (hour >= EVENING_HOUR || eveningRecord[dayKey] !== undefined);
+    const shouldLockCalendar = (weekend || eveningModeActive) && !drawerOpened;
 
-    lockWeekdayTabs(weekend || (eveningModeActive && !drawerOpened));
+    lockWeekdayTabs(shouldLockCalendar);
 
-    const drawerNote = document.getElementById('eveningDrawerNote');
-    if(drawerNote){
-      drawerNote.classList.toggle('unlocked', drawerOpened);
-      document.getElementById('openDrawerBtn').textContent = drawerOpened ? '다시 서랍에 넣기' : '서랍에서 꺼내보기';
-      document.getElementById('drawerNoteText').textContent = drawerOpened
+    document.querySelectorAll('.drawer-note-text').forEach(el=>{
+      el.textContent = drawerOpened
         ? '📦 지금은 서랍에서 꺼내봤어요.'
         : '📦 학교 업무 투두는 지금 서랍 속에 넣어뒀어요.';
-    }
+    });
+    document.querySelectorAll('.drawer-note-box').forEach(el=>{
+      el.classList.toggle('unlocked', drawerOpened);
+    });
+    document.querySelectorAll('.drawer-toggle-btn').forEach(el=>{
+      el.textContent = drawerOpened ? '다시 서랍에 넣기' : '서랍에서 꺼내보기';
+    });
 
     if(weekend){
       // 주말엔 감정/배터리 질문 없음 — 모달 자체를 띄우지 않음
@@ -2553,9 +2568,9 @@
       if(!weekendShown[dayKey]){
         openWeekendOverlay(dayKey);
       }
-      // 평일 탭에 있었다면 주말 아카이브로 강제 이동
+      // 평일 탭에 있었다면 주말 아카이브로 강제 이동 (서랍을 열어둔 경우는 그대로 둠)
       const activeBtn = document.querySelector('.tab-btn.active');
-      if(activeBtn && activeBtn.dataset.view==='calendar'){
+      if(!drawerOpened && activeBtn && activeBtn.dataset.view==='calendar'){
         document.querySelector('.tab-btn[data-view="weekend"]').click();
       }
     } else {
@@ -3345,17 +3360,19 @@
   }
 
   // ---- 저녁 모드: 서랍 토글 ----
-  document.getElementById('openDrawerBtn').addEventListener('click', ()=>{
-    drawerOpened = !drawerOpened;
-    checkDayGates();
+  document.querySelectorAll('.drawer-toggle-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      drawerOpened = !drawerOpened;
+      checkDayGates();
+    });
   });
 
-  // ---- 저녁 모드: 홈 스위트 홈 (퇴근 에너지별 미션) ----
-  const homeMissionsByTier = {
-    100: ['🏋️ 헬스 유산소나 폴댄스 가기', '🌱 식물 분갈이나 propagation(번식) 챙기기'],
-    80:  ['🏋️ 헬스 유산소나 폴댄스 가기', '🌱 식물 분갈이나 propagation(번식) 챙기기'],
-    50:  ['🧘 가볍게 스트레칭하기', '🧶 뜨개질 게이지 계산하거나 도안 한 단 뜨기'],
-    20:  null, // 휴식 전용 카드
+  // ---- 저녁 모드: 홈 스위트 홈 (퇴근 에너지별 미션, 사용자 직접 편집) ----
+  let homeMissions = {
+    100: [{id:'demo-h100-1', label:'🏋️ 헬스 유산소나 폴댄스 가기'}, {id:'demo-h100-2', label:'🌱 식물 분갈이나 propagation(번식) 챙기기'}],
+    80:  [{id:'demo-h80-1', label:'🏋️ 헬스 유산소나 폴댄스 가기'}, {id:'demo-h80-2', label:'🌱 식물 분갈이나 propagation(번식) 챙기기'}],
+    50:  [{id:'demo-h50-1', label:'🧘 가볍게 스트레칭하기'}, {id:'demo-h50-2', label:'🧶 뜨개질 게이지 계산하거나 도안 한 단 뜨기'}],
+    20:  [],
   };
 
   function renderHomeMission(){
@@ -3366,7 +3383,8 @@
       box.innerHTML = '<div class="exercise-tier-empty">아직 오늘 퇴근 에너지를 안 골랐어요. 가계부 탭에서 먼저 골라주세요.</div>';
       return;
     }
-    if(tier <= 20){
+    const missions = homeMissions[tier] || [];
+    if(missions.length===0){
       box.innerHTML = `
         <div class="home-rest-card">
           🛌 오늘은 아무것도 안 하고 침대로 직행해도 괜찮아요.<br>
@@ -3374,13 +3392,60 @@
         </div>`;
       return;
     }
-    const missions = homeMissionsByTier[tier] || homeMissionsByTier[50];
     box.innerHTML = `
       <div class="home-tier-badge"><span class="htb-pct">${tier}%</span> 모드 집순이 미션</div>
       <div class="home-mission-list">
-        ${missions.map(m=>`<div class="home-mission-item">${m}</div>`).join('')}
+        ${missions.map(m=>`<div class="home-mission-item">${m.label}</div>`).join('')}
       </div>`;
   }
+
+  function renderHomeMissionEditGrid(){
+    const grid = document.getElementById('homeMissionEditGrid');
+    grid.innerHTML = '';
+    [100,80,50,20].forEach(tier=>{
+      const card = document.createElement('div');
+      card.className = 'plan-tier';
+      card.dataset.pct = tier;
+      card.innerHTML = `<div class="plan-tier-head">${energyIconByPct(tier)} ${tier}%</div>`;
+      homeMissions[tier].forEach(item=>{
+        const row = document.createElement('div');
+        row.className = 'plan-item';
+        row.innerHTML = `<span>${item.label}</span><button>✕</button>`;
+        row.querySelector('button').addEventListener('click', async ()=>{
+          homeMissions[tier] = homeMissions[tier].filter(i=>i!==item);
+          renderHomeMissionEditGrid();
+          renderHomeMission();
+          if(typeof item.id === 'string' && !item.id.startsWith('demo-')) await dbDelete('home_missions', item.id);
+        });
+        card.appendChild(row);
+      });
+      const addRow = document.createElement('div');
+      addRow.className = 'plan-add-row';
+      addRow.innerHTML = `<input type="text" placeholder="미션 추가"><button>추가</button>`;
+      const input = addRow.querySelector('input');
+      addRow.querySelector('button').addEventListener('click', async ()=>{
+        const val = input.value.trim();
+        if(!val) return;
+        const item = {id:Date.now(), label:val};
+        homeMissions[tier].push(item);
+        input.value = '';
+        renderHomeMissionEditGrid();
+        renderHomeMission();
+        const saved = await dbInsert('home_missions', {user_id:currentUserId, energy_tier:tier, label:val});
+        if(saved) item.id = saved.id;
+      });
+      input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addRow.querySelector('button').click(); });
+      card.appendChild(addRow);
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById('homeMissionEditToggle').addEventListener('click', ()=>{
+    const grid = document.getElementById('homeMissionEditGrid');
+    const opening = grid.style.display === 'none';
+    grid.style.display = opening ? 'grid' : 'none';
+    if(opening) renderHomeMissionEditGrid();
+  });
 
   // ---- 저녁 모드: 주말 아카이브 미리보기 ----
   document.getElementById('weekendPeekBtn').addEventListener('click', ()=>{
@@ -3441,7 +3506,7 @@
       if(btn.classList.contains('locked')){
         const dayKey = appDayKey(testNow);
         if(isWeekendDayKey(dayKey)){
-          alert('평일 업무 메뉴는 월요일 아침까지 잠금 처리됩니다.');
+          alert('지금은 주말 모드예요. 주말 탭의 "서랍에서 꺼내보기" 버튼을 누르면 잠깐 열어볼 수 있어요.');
         } else {
           alert('지금은 저녁 모드예요. 저녁 탭의 "서랍에서 꺼내보기" 버튼을 누르면 잠깐 열어볼 수 있어요.');
         }
