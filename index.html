@@ -20,8 +20,8 @@
      ===================================================== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
+  const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
     ? null
     : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -46,6 +46,8 @@
     font-family:'Pretendard','Noto Sans KR',sans-serif;
     color:var(--green-ink);
     min-height:100vh;
+    word-break:keep-all;
+    overflow-wrap:break-word;
   }
   .app{
     max-width:1080px;
@@ -579,7 +581,7 @@
     font-size:13px;
     font-family:'Pretendard',sans-serif;
   }
-  .type-toggle, .major-toggle{display:flex;gap:8px;}
+  .type-toggle, .major-toggle, .task-cat-row{display:flex;gap:8px;}
   .type-btn, .major-btn{
     flex:1;
     border:1px solid var(--line);
@@ -885,6 +887,27 @@
     color:var(--terracotta);
   }
   .evening-drawer-note.unlocked button{border-color:var(--terracotta);color:var(--terracotta);}
+
+  .evening-todo-list{display:flex;flex-direction:column;gap:8px;}
+  .evening-todo-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(217,107,67,0.07);
+    border-radius:10px;
+    padding:11px 13px;
+    font-size:13px;
+    color:var(--green-ink);
+    font-weight:600;
+  }
+  .evening-todo-item input{width:16px;height:16px;accent-color:var(--terracotta);cursor:pointer;}
+  .evening-todo-item.is-done{opacity:0.55;text-decoration:line-through;}
+  .evening-todo-empty{
+    font-size:11.5px;
+    color:var(--muted);
+    text-align:center;
+    padding:12px 4px;
+  }
 
   .commute-list{display:flex;flex-direction:column;gap:9px;}
   .commute-item{
@@ -1741,6 +1764,42 @@
   }
   .skip-btn:hover{border-color:var(--green-deep);color:var(--green-deep);}
   @media (max-width:760px){
+    /* ---- 여백 & 간격 ---- */
+    .app{
+      padding:20px 16px 90px; /* 하단 네비게이션 공간 확보 */
+    }
+    .wallet-layout{gap:20px;}
+    .layout{grid-template-columns:1fr;gap:16px;}
+
+    /* ---- 모든 다중 컬럼 그리드 → 1열 ---- */
+    .plan-tier-grid,
+    .budget-row,
+    .log-btn-row:not(.three){
+      grid-template-columns:1fr !important;
+    }
+    .log-btn-row.three{grid-template-columns:1fr 1fr;}
+    .log-btn-row.three .log-btn:last-child{grid-column:span 2;}
+
+    /* ---- 타이틀/숫자 텍스트 크기 축소 (줄바꿈 방지) ---- */
+    .page-head h1{font-size:18px;}
+    .bb-num{font-size:19px;}
+    .budget-block .bb-num{font-size:19px;}
+    .vault-amount{font-size:21px;}
+    .timer-display{font-size:34px;}
+    .pledge-text{font-size:14px;}
+    .wi-price{font-size:13.5px;}
+
+    /* ---- 터치 영역 확대 ---- */
+    .log-btn, .bb-stamp, .major-btn, .type-btn, .energy-toggle,
+    .sub-chip, .tab-btn, .confirm-add-btn, .skip-btn{
+      padding-top:12px;
+      padding-bottom:12px;
+      font-size:13px;
+    }
+    .stamp .pct{font-size:16px;}
+    .morning-card .stamp{padding:4px;}
+
+    /* ---- 기존 규칙 유지 ---- */
     .layout{grid-template-columns:1fr;}
     .weekday-header, .month-grid{
       grid-template-columns:repeat(7,38px);
@@ -1764,9 +1823,50 @@
       transform:translateY(100%);
     }
     .detail-panel.open{transform:translateY(0);}
-    .log-btn-row.three{grid-template-columns:1fr 1fr;}
-    .log-btn-row.three .log-btn:last-child{grid-column:span 2;}
+
+    /* ---- 하단 네비게이션 바 (모바일 전용) ---- */
+    .tab-bar{
+      display:none; /* 상단 탭은 모바일에서 숨기고 하단 네비로 대체 */
+    }
+    .bottom-nav{
+      display:flex;
+    }
   }
+
+  /* ---- 하단 네비게이션 바 (기본: 데스크탑에서 숨김) ---- */
+  .bottom-nav{
+    display:none;
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:var(--beige-card);
+    border-top:1px solid var(--line);
+    box-shadow:0 -8px 24px -10px rgba(46,90,68,0.18);
+    z-index:70;
+    padding:6px 4px;
+    padding-bottom:max(6px, env(safe-area-inset-bottom));
+  }
+  .bottom-nav-btn{
+    flex:1;
+    border:none;
+    background:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    padding:7px 2px;
+    font-size:10.5px;
+    font-weight:700;
+    color:var(--muted);
+    cursor:pointer;
+    border-radius:10px;
+  }
+  .bottom-nav-btn .bn-icon{font-size:18px;}
+  .bottom-nav-btn.active{
+    color:var(--green-deep);
+    background:rgba(46,90,68,0.08);
+  }
+  .bottom-nav-btn.locked{opacity:0.4;}
+  .bottom-nav-btn.active .bn-icon{filter:none;}
 </style>
 </head>
 <body>
@@ -1839,6 +1939,11 @@
       <input type="date" id="newSchedStart">
       <span>~</span>
       <input type="date" id="newSchedEnd">
+    </div>
+
+    <div class="task-cat-row" id="taskCatRow">
+      <button class="major-btn selected" data-taskcat="school">🏫 학교 업무</button>
+      <button class="major-btn" data-taskcat="evening">🌙 저녁 일상</button>
     </div>
 
     <div class="major-toggle">
@@ -1982,6 +2087,11 @@
     </div>
 
     <div class="wallet-layout">
+
+      <div class="log-card" id="eveningTodoCard">
+        <div class="log-section-title">🌆 오늘 저녁 할 일 <span class="all-day-note">에너지와 무관하게 항상 또렷하게</span></div>
+        <div class="evening-todo-list" id="eveningTodoList"></div>
+      </div>
 
       <div class="log-card">
         <div class="log-section-title">🚌 퇴근길 멍-타임라인 <span class="all-day-note">뇌 빼고 슥슥 체크만</span></div>
@@ -2430,6 +2540,7 @@
       return {
         id:t.id, date:t.date, title:t.title, energy:t.energy_level||'mid',
         major:t.major, sub:t.sub_category, projectId:t.project_id,
+        taskCategory:t.task_category||'school', completed:!!t.is_completed,
         history: ownHist.length ? ownHist : [{stage:'등록', date:(t.date||'').slice(5,10).replace('-','.'), note:'불러온 일정'}]
       };
     });
@@ -2488,7 +2599,7 @@
 
     dataLoaded = true;
     renderMonthGrid(); renderPeriodEvents(); renderBank(); renderWallet();
-    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab(); renderWishlist(); renderHomeMission();
+    renderPlanGrid(); renderExerciseToday(); renderExerciseFeed(); renderWeekendTab(); renderWishlist(); renderHomeMission(); renderEveningTodos();
     checkDayGates();
   }
 
@@ -2523,6 +2634,9 @@
       if(v==='calendar'){
         btn.classList.toggle('locked', shouldLock);
       }
+    });
+    document.querySelectorAll('.bottom-nav-btn[data-view="calendar"]').forEach(btn=>{
+      btn.classList.toggle('locked', shouldLock);
     });
   }
 
@@ -2609,6 +2723,7 @@
     }
 
     if(typeof renderHomeMission === 'function') renderHomeMission();
+    if(typeof renderEveningTodos === 'function') renderEveningTodos();
 
     renderMonthGrid();
     renderWallet();
@@ -2731,25 +2846,46 @@
   let morningTimerInterval = null;
   let attendChecked = false;
 
+  let morningTimerEndAt = null;
+
   function startMorningTimer(){
     document.getElementById('morningStep1').style.display = 'none';
     document.getElementById('morningStep2').style.display = 'block';
-    let remaining = 600; // 10분 = 600초
+    morningTimerEndAt = Date.now() + 600000; // 10분 후 실제 시각
     const display = document.getElementById('timerDisplay');
     function tick(){
+      const remainingMs = morningTimerEndAt - Date.now();
+      const remaining = Math.max(0, Math.round(remainingMs/1000));
       const m = Math.floor(remaining/60), s = remaining%60;
       display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      if(remaining<=0){
+      if(remainingMs<=0){
         clearInterval(morningTimerInterval);
         morningTimerInterval = null;
+        morningTimerEndAt = null;
         goToBatteryStep();
         return;
       }
-      remaining--;
     }
     tick();
     morningTimerInterval = setInterval(tick, 1000);
   }
+
+  // 화면이 꺼졌다가 다시 켜지거나 탭으로 돌아왔을 때, 타이머가 실제로 끝나있으면 바로 다음 단계로
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible' && morningTimerEndAt !== null){
+      if(Date.now() >= morningTimerEndAt){
+        clearInterval(morningTimerInterval);
+        morningTimerInterval = null;
+        morningTimerEndAt = null;
+        goToBatteryStep();
+      } else {
+        const display = document.getElementById('timerDisplay');
+        const remaining = Math.max(0, Math.round((morningTimerEndAt - Date.now())/1000));
+        const m = Math.floor(remaining/60), s = remaining%60;
+        display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }
+    }
+  });
 
   function goToBatteryStep(){
     document.getElementById('morningStep2').style.display = 'none';
@@ -3171,6 +3307,15 @@
   let schedMajor = 'work';
   let schedSub = categories.work[0];
   let schedProjectId = null;
+  let schedTaskCategory = 'school';
+
+  document.querySelectorAll('#taskCatRow .major-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#taskCatRow .major-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      schedTaskCategory = btn.dataset.taskcat;
+    });
+  });
 
   document.getElementById('addSchedToggle').addEventListener('click', ()=>{
     const card = document.getElementById('addScheduleCard');
@@ -3203,6 +3348,7 @@
       schedType = btn.dataset.type;
       document.getElementById('dateFieldsSingle').style.display = schedType==='single' ? 'flex' : 'none';
       document.getElementById('dateFieldsPeriod').style.display = schedType==='period' ? 'flex' : 'none';
+      document.getElementById('taskCatRow').style.display = schedType==='single' ? 'flex' : 'none';
       renderProjectChips();
     });
   });
@@ -3262,7 +3408,7 @@
       if(!date){ alert('날짜를 선택해주세요'); return; }
       const sched = {
         id:Date.now(), date, title, energy:'mid', major:schedMajor, sub:schedSub,
-        projectId:schedProjectId,
+        projectId:schedProjectId, taskCategory:schedTaskCategory, completed:false,
         history:[{stage:'등록', date:`${date.slice(5,7)}.${date.slice(8,10)}`, note:'일정 생성됨'}]
       };
       schedules.push(sched);
@@ -3270,8 +3416,10 @@
       viewYear = y; viewMonth = m-1;
       renderMonthGrid();
       renderPeriodEvents();
+      if(typeof renderEveningTodos==='function') renderEveningTodos();
       const saved = await dbInsert('todo_tasks', {
         user_id:currentUserId, title, energy_level:'mid', major:schedMajor, sub_category:schedSub,
+        task_category:schedTaskCategory, is_completed:false,
         project_id: (typeof schedProjectId==='number' || schedProjectId===null) ? null : schedProjectId,
         date
       });
@@ -3309,6 +3457,9 @@
     document.getElementById('newSchedEnd').value = '';
     document.getElementById('addScheduleCard').style.display = 'none';
     schedProjectId = null;
+    schedTaskCategory = 'school';
+    document.querySelectorAll('#taskCatRow .major-btn').forEach(b=>b.classList.remove('selected'));
+    document.querySelector('#taskCatRow .major-btn[data-taskcat="school"]').classList.add('selected');
   });
 
   document.getElementById('addBankBtn').addEventListener('click', async ()=>{
@@ -3374,6 +3525,30 @@
     50:  [{id:'demo-h50-1', label:'🧘 가볍게 스트레칭하기'}, {id:'demo-h50-2', label:'🧶 뜨개질 게이지 계산하거나 도안 한 단 뜨기'}],
     20:  [],
   };
+
+  // ---- 저녁 모드: 오늘 저녁 할 일 (저녁 일상 투두) ----
+  function renderEveningTodos(){
+    const list = document.getElementById('eveningTodoList');
+    if(!list) return;
+    const todayKey = appDayKey(testNow);
+    const todos = schedules.filter(s=>s.date===todayKey && s.taskCategory==='evening');
+    if(todos.length===0){
+      list.innerHTML = '<div class="evening-todo-empty">오늘 등록된 저녁 일상 투두가 없어요. 캘린더 탭에서 "저녁 일상"으로 미리 등록해보세요.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    todos.forEach(s=>{
+      const row = document.createElement('label');
+      row.className = 'evening-todo-item' + (s.completed ? ' is-done' : '');
+      row.innerHTML = `<input type="checkbox" ${s.completed ? 'checked' : ''}><span>${s.title}</span>`;
+      row.querySelector('input').addEventListener('change', async (e)=>{
+        s.completed = e.target.checked;
+        renderEveningTodos();
+        await dbUpdate('todo_tasks', s.id, { is_completed: s.completed });
+      });
+      list.appendChild(row);
+    });
+  }
 
   function renderHomeMission(){
     const box = document.getElementById('homeMissionBox');
@@ -3516,7 +3691,20 @@
       btn.classList.add('active');
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
       document.getElementById('view-' + btn.dataset.view).classList.add('active');
-      if(btn.dataset.view==='evening' && typeof renderHomeMission==='function') renderHomeMission();
+      document.querySelectorAll('.bottom-nav-btn').forEach(b=>{
+        b.classList.toggle('active', b.dataset.view===btn.dataset.view);
+      });
+      if(btn.dataset.view==='evening'){
+        if(typeof renderHomeMission==='function') renderHomeMission();
+        if(typeof renderEveningTodos==='function') renderEveningTodos();
+      }
+    });
+  });
+
+  document.querySelectorAll('.bottom-nav-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = document.querySelector(`.tab-btn[data-view="${btn.dataset.view}"]`);
+      if(target) target.click();
     });
   });
 
@@ -4348,6 +4536,13 @@
     if(typeof renderWishlist==='function') renderWishlist();
   }, 60000);
 </script>
+
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-btn active" data-view="calendar"><span class="bn-icon">📅</span>대시보드</button>
+  <button class="bottom-nav-btn" data-view="wallet"><span class="bn-icon">💰</span>가계부</button>
+  <button class="bottom-nav-btn" data-view="diet"><span class="bn-icon">🏃</span>다이어트</button>
+  <button class="bottom-nav-btn" data-view="wishlist"><span class="bn-icon">🛒</span>장바구니</button>
+</nav>
 
 </body>
 </html>
