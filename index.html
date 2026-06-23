@@ -20,8 +20,8 @@
      ===================================================== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
+  const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
     ? null
     : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -2971,8 +2971,7 @@
   let currentBattery = 100;
   let newItemEnergy = 'mid';
 
-  const todayStr = '2026-06-22';
-  let viewYear = 2026, viewMonth = 5; // 0-indexed (5 = June)
+  let viewYear = testNow.getFullYear(), viewMonth = testNow.getMonth(); // 실제 오늘이 속한 달로 시작
 
   function pad2(n){return String(n).padStart(2,'0');}
   function isoDate(y,m,d){return `${y}-${pad2(m+1)}-${pad2(d)}`;}
@@ -2998,7 +2997,7 @@
 
     for(let d=1; d<=daysInMonth; d++){
       const dateStr = isoDate(viewYear, viewMonth, d);
-      const isToday = dateStr===todayStr;
+      const isToday = dateStr===appDayKey(testNow);
       const cell = document.createElement('div');
       cell.className = 'month-cell' + (isToday ? ' is-today' : '');
       cell.innerHTML = `<span class="date-num">${d}</span>`;
@@ -3046,7 +3045,7 @@
   }
 
   function buildPeriodBar(p, archivedMode){
-    const today = new Date(todayStr);
+    const today = new Date(appDayKey(testNow));
     const start = new Date(p.startDate);
     const end = new Date(p.endDate);
     const totalDays = Math.max(1, Math.round((end-start)/86400000)+1);
@@ -3119,7 +3118,7 @@
           ? item.history
           : [{stage:'오늘로 꺼냄', date:'06.22', note:item.meta}];
         const sched = {
-          id:Date.now(), date:todayStr, title:item.label,
+          id:Date.now(), date:appDayKey(testNow), title:item.label,
           major:'work', sub: item.recurring ? '도서관운영' : '기타',
           history:restoredHistory,
           fromBank:true, bankLabel:item.label, bankMeta:item.meta, recurring:item.recurring, energy:item.energy
@@ -3131,7 +3130,7 @@
         await dbDelete('dopamine_bank', item.id);
         const saved = await dbInsert('todo_tasks', {
           user_id:currentUserId, title:item.label, energy_level:item.energy||'mid',
-          major:'work', sub_category: sched.sub, date:todayStr
+          major:'work', sub_category: sched.sub, date:appDayKey(testNow)
         });
         if(saved){ sched.id = saved.id; renderMonthGrid(); }
       });
@@ -3209,7 +3208,7 @@
     const period = findItem(activeId, 'period');
     const dateInput = document.getElementById('linkedDateInput');
     const titleInput = document.getElementById('linkedTitleInput');
-    const date = dateInput.value || todayStr;
+    const date = dateInput.value || appDayKey(testNow);
     const title = titleInput.value.trim();
     if(!title) return;
     const sched = {
@@ -3820,7 +3819,7 @@
         exerciseLogs.push(log);
         renderExerciseFeed();
         const saved = await dbInsert('exercise_logs', {
-          user_id:currentUserId, date:todayStr, energy_tier:tier, label:item.label
+          user_id:currentUserId, date:appDayKey(testNow), energy_tier:tier, label:item.label
         });
         if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderExerciseFeed(); }
       });
@@ -3904,7 +3903,7 @@
     input.value = '';
     renderExerciseFeed();
     const saved = await dbInsert('exercise_logs', {
-      user_id:currentUserId, date:todayStr, energy_tier:tier, label:val
+      user_id:currentUserId, date:appDayKey(testNow), energy_tier:tier, label:val
     });
     if(saved){ log.id = saved.id; log.t = new Date(saved.created_at).getTime(); renderExerciseFeed(); }
   });
@@ -3943,6 +3942,12 @@
     const isWeekend = snap.isWeekend;
     const lowBattery = eveningBattery <= 20;
     const carryIn = snap.carryIn, available = snap.available, moneyUsed = snap.moneyUsed;
+
+    const walletLabel = document.getElementById('walletDateLabel');
+    if(walletLabel){
+      const dow = ['일','월','화','수','목','금','토'][new Date(todayKey+'T00:00:00').getDay()];
+      walletLabel.textContent = `${todayKey.slice(5,7)}.${todayKey.slice(8,10)} (${dow})`;
+    }
 
     document.getElementById('moneyUsed').textContent = moneyUsed.toLocaleString();
     document.getElementById('moneyBudget').textContent = available.toLocaleString();
