@@ -20,8 +20,8 @@
      ===================================================== -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://dtszsdajbfdcpjajajfg.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0c3pzZGFqYmZkY3BqYWphamZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzQ3OTcsImV4cCI6MjA5NzY1MDc5N30.p_WKuCk5BT5SaPE9aB2J2utCENRoythHgFd1oWsGvY8';
+  const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   const supabaseClient = (SUPABASE_URL.startsWith('YOUR_'))
     ? null
     : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1866,6 +1866,50 @@
     background:rgba(46,90,68,0.08);
   }
   .bottom-nav-btn.locked{opacity:0.4;}
+
+  .more-sheet{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    background:var(--beige-card);
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -18px 50px -10px rgba(0,0,0,0.3);
+    padding:10px 16px calc(16px + env(safe-area-inset-bottom));
+    transform:translateY(100%);
+    transition:transform .25s ease;
+    z-index:101;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .more-sheet.open{transform:translateY(0);}
+  .more-sheet-handle{
+    width:36px;height:4px;
+    background:var(--line);
+    border-radius:3px;
+    margin:4px auto 10px;
+  }
+  .more-sheet-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--line);
+    background:var(--beige);
+    color:var(--green-ink);
+    font-size:14px;
+    font-weight:700;
+    padding:14px 16px;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .more-sheet-item .bn-icon{font-size:18px;}
+  .more-sheet-close{
+    border:none;
+    background:none;
+    color:var(--muted);
+    font-size:12.5px;
+    padding:10px 0 2px;
+    cursor:pointer;
+  }
   .bottom-nav-btn.active .bn-icon{filter:none;}
 </style>
 </head>
@@ -3698,9 +3742,10 @@
       btn.classList.add('active');
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
       document.getElementById('view-' + btn.dataset.view).classList.add('active');
-      document.querySelectorAll('.bottom-nav-btn').forEach(b=>{
+      document.querySelectorAll('.bottom-nav-btn[data-view]').forEach(b=>{
         b.classList.toggle('active', b.dataset.view===btn.dataset.view);
       });
+      document.getElementById('moreNavBtn').classList.toggle('active', btn.dataset.view==='evening' || btn.dataset.view==='weekend');
       if(btn.dataset.view==='evening'){
         if(typeof renderHomeMission==='function') renderHomeMission();
         if(typeof renderEveningTodos==='function') renderEveningTodos();
@@ -3708,10 +3753,29 @@
     });
   });
 
-  document.querySelectorAll('.bottom-nav-btn').forEach(btn=>{
+  document.querySelectorAll('.bottom-nav-btn[data-view]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const target = document.querySelector(`.tab-btn[data-view="${btn.dataset.view}"]`);
       if(target) target.click();
+    });
+  });
+
+  function openMoreSheet(){
+    document.getElementById('moreSheetOverlay').classList.add('open');
+    document.getElementById('moreSheet').classList.add('open');
+  }
+  function closeMoreSheet(){
+    document.getElementById('moreSheetOverlay').classList.remove('open');
+    document.getElementById('moreSheet').classList.remove('open');
+  }
+  document.getElementById('moreNavBtn').addEventListener('click', openMoreSheet);
+  document.getElementById('closeMoreSheetBtn').addEventListener('click', closeMoreSheet);
+  document.getElementById('moreSheetOverlay').addEventListener('click', closeMoreSheet);
+  document.querySelectorAll('.more-sheet-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const target = document.querySelector(`.tab-btn[data-view="${item.dataset.view}"]`);
+      if(target) target.click();
+      closeMoreSheet();
     });
   });
 
@@ -4555,7 +4619,16 @@
   <button class="bottom-nav-btn" data-view="wallet"><span class="bn-icon">💰</span>가계부</button>
   <button class="bottom-nav-btn" data-view="diet"><span class="bn-icon">🏃</span>다이어트</button>
   <button class="bottom-nav-btn" data-view="wishlist"><span class="bn-icon">🛒</span>장바구니</button>
+  <button class="bottom-nav-btn" id="moreNavBtn"><span class="bn-icon">⋯</span>더보기</button>
 </nav>
+
+<div class="overlay" id="moreSheetOverlay"></div>
+<div class="more-sheet" id="moreSheet">
+  <div class="more-sheet-handle"></div>
+  <button class="more-sheet-item" data-view="evening"><span class="bn-icon">🌙</span>저녁 모드</button>
+  <button class="more-sheet-item" data-view="weekend"><span class="bn-icon">🌿</span>주말 아카이브</button>
+  <button class="more-sheet-close" id="closeMoreSheetBtn">닫기</button>
+</div>
 
 </body>
 </html>
