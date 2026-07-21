@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>내 작은 방</title>
+<title>AllCotton</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-1:#fff7f0;
-    --bg-2:#f1e9fb;
     --card:#ffffff;
     --coral:#ffb2a6;
     --coral-deep:#ff9587;
@@ -23,7 +22,6 @@
     --line:#f0e4ea;
     --shadow: 0 8px 24px rgba(91,75,78,0.10);
     --shadow-soft: 0 4px 14px rgba(91,75,78,0.08);
-    --radius: 26px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -39,58 +37,44 @@
     position:fixed;
     border-radius:50%;
     filter:blur(2px);
-    opacity:0.35;
+    opacity:0.3;
     z-index:0;
-    animation:float 14s ease-in-out infinite;
+    animation:float 16s ease-in-out infinite;
   }
-  .blob1{width:180px;height:180px;background:var(--coral);top:-60px;left:-60px;animation-delay:0s;}
-  .blob2{width:140px;height:140px;background:var(--mint);bottom:10%;right:-50px;animation-delay:3s;}
-  .blob3{width:90px;height:90px;background:var(--yellow);top:40%;left:-40px;animation-delay:6s;}
-  .blob4{width:110px;height:110px;background:var(--lavender);bottom:-40px;right:20%;animation-delay:2s;}
+  .blob1{width:150px;height:150px;background:var(--coral);top:-40px;right:-50px;animation-delay:0s;}
+  .blob2{width:120px;height:120px;background:var(--mint);bottom:20%;left:-50px;animation-delay:4s;}
+  .blob3{width:90px;height:90px;background:var(--yellow);bottom:-30px;right:15%;animation-delay:2s;}
   @keyframes float{
     0%,100%{transform:translateY(0) rotate(0deg);}
-    50%{transform:translateY(-22px) rotate(8deg);}
+    50%{transform:translateY(-18px) rotate(8deg);}
   }
-  @media (prefers-reduced-motion: reduce){
-    .blob{animation:none;}
-  }
-
-  .wrap{
-    position:relative;
-    z-index:1;
-    max-width:760px;
-    margin:0 auto;
-    padding:28px 20px 60px;
-  }
+  @media (prefers-reduced-motion: reduce){ .blob{animation:none;} .reveal{transition:none !important; opacity:1 !important; transform:none !important;} }
 
   header{
+    position:sticky;
+    top:0;
+    z-index:10;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:18px;
+    padding:16px 20px;
+    background:rgba(255,255,255,0.85);
+    backdrop-filter:blur(8px);
   }
   .site-title{
     font-family:'Gaegu', sans-serif;
-    font-size:14px;
+    font-size:13px;
     font-weight:700;
     letter-spacing:1.5px;
     text-transform:uppercase;
     color:var(--text-sub);
     outline:none;
   }
-  .date-badge{
-    font-size:12px;
-    color:var(--text-sub);
-    background:var(--card);
-    padding:6px 12px;
-    border-radius:20px;
-    box-shadow:var(--shadow-soft);
-    white-space:nowrap;
-  }
+  .header-right{display:flex;align-items:center;}
   .sync-status{
-    font-size:13px;
+    font-size:12px;
     background:var(--card);
-    width:32px;height:32px;
+    width:30px;height:30px;
     display:flex;align-items:center;justify-content:center;
     border-radius:50%;
     box-shadow:var(--shadow-soft);
@@ -101,233 +85,274 @@
   .edit-toggle{
     border:none;
     background:var(--card);
-    width:38px;height:38px;
+    width:34px;height:34px;
     border-radius:50%;
     box-shadow:var(--shadow-soft);
-    font-size:16px;
+    font-size:15px;
     cursor:pointer;
-    margin-left:8px;
     transition:transform .15s ease;
   }
   .edit-toggle:hover{transform:scale(1.08) rotate(-8deg);}
-  .header-right{display:flex;align-items:center;}
 
-  .grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:18px;
-  }
-  @media (max-width:640px){
-    .grid{grid-template-columns:1fr;}
-  }
-
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:20px;
+  .wrap{
     position:relative;
-  }
-  .card-title{
-    font-family:'Gaegu', sans-serif;
-    font-size:19px;
-    font-weight:700;
-    margin:0 0 12px 0;
-    display:flex;
-    align-items:center;
-    gap:6px;
+    z-index:1;
+    max-width:420px;
+    margin:0 auto;
+    padding:20px 24px 70px;
   }
 
-  /* ---------- Profile flip card ---------- */
-  .profile-outer{
-    grid-column:span 1;
-    perspective:1200px;
-    padding:0;
-    background:none;
-    box-shadow:none;
-    min-height:290px;
+  /* ---------- desktop: side-by-side ---------- */
+  @media (min-width:840px){
+    .wrap{
+      max-width:820px;
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:48px;
+      align-items:start;
+      padding-top:36px;
+    }
+    .sidebar{position:sticky; top:96px;}
   }
-  .flip-inner{
-    position:relative;
-    width:100%;
-    height:100%;
-    min-height:290px;
-    transition:transform .7s cubic-bezier(.22,1,.36,1);
-    transform-style:preserve-3d;
+
+  .reveal{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .6s ease, transform .6s ease;
   }
-  .flipped .flip-inner{transform:rotateY(180deg);}
-  .flip-face{
-    position:absolute;
-    inset:0;
-    backface-visibility:hidden;
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:22px 18px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+
+  /* ---------- hero ---------- */
+  .hero{
     text-align:center;
+    padding:34px 0 26px;
   }
-  .flip-back{
-    transform:rotateY(180deg);
-    text-align:left;
-    align-items:flex-start;
-    justify-content:center;
-  }
+  @media (min-width:840px){ .hero{padding-top:0;} }
   .avatar{
-    width:92px;height:92px;
+    width:128px;height:128px;
     border-radius:50%;
     background:linear-gradient(135deg,var(--coral),var(--lavender));
     display:flex;align-items:center;justify-content:center;
-    font-size:34px;
+    font-size:44px;
     color:#fff;
-    margin-bottom:14px;
+    margin:0 auto 18px;
     cursor:pointer;
     background-size:cover;
     background-position:center;
-    border:4px solid #fff;
-    box-shadow:var(--shadow-soft);
+    border:5px solid #fff;
+    box-shadow:var(--shadow);
     overflow:hidden;
   }
   .profile-name{
     font-family:'Gaegu', sans-serif;
-    font-size:22px;
+    font-size:32px;
     font-weight:700;
     outline:none;
   }
   .profile-tag{
-    font-size:12px;
+    font-size:13px;
     color:#fff;
     background:var(--coral-deep);
-    padding:4px 12px;
+    padding:6px 16px;
     border-radius:20px;
-    margin:8px 0 10px;
+    margin:10px 0 16px;
     outline:none;
     display:inline-block;
   }
   .profile-intro{
-    font-size:13px;
-    color:var(--text-sub);
-    line-height:1.6;
-    outline:none;
-    max-width:220px;
-  }
-  .flip-btn{
-    position:absolute;
-    bottom:14px; right:14px;
-    border:none;
-    background:var(--bg-2);
-    width:32px;height:32px;
-    border-radius:50%;
     font-size:14px;
-    cursor:pointer;
-    z-index:2;
-  }
-  .info-row{
-    display:flex;
-    gap:8px;
-    width:100%;
-    padding:6px 0;
-    border-bottom:1px dashed var(--line);
-    font-size:13px;
-  }
-  .info-label{
-    color:var(--lavender-deep);
-    font-weight:700;
-    min-width:70px;
-    flex-shrink:0;
-  }
-  .info-value{flex:1;outline:none;}
-  .quote{
-    margin-top:12px;
-    font-family:'Gaegu', sans-serif;
-    font-size:15px;
     color:var(--text-sub);
+    line-height:1.7;
     outline:none;
+    max-width:300px;
+    margin:0 auto;
   }
 
-  /* ---------- Music card ---------- */
+  .divider{
+    text-align:center;
+    color:var(--line);
+    letter-spacing:8px;
+    font-size:12px;
+    margin:8px 0 26px;
+  }
+
+  /* ---------- mini album ---------- */
+  .section{margin-bottom:34px;}
+  .section-title{
+    font-family:'Gaegu', sans-serif;
+    font-size:18px;
+    font-weight:700;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .album-strip{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding:2px 2px 10px;
+    scroll-snap-type:x proximity;
+  }
+  .album-strip::-webkit-scrollbar{height:5px;}
+  .album-strip::-webkit-scrollbar-thumb{background:var(--line); border-radius:10px;}
+  .album-photo{
+    position:relative;
+    flex:0 0 auto;
+    width:110px;height:110px;
+    border-radius:18px;
+    overflow:hidden;
+    background:var(--bg-1);
+    box-shadow:var(--shadow-soft);
+    scroll-snap-align:start;
+  }
+  .album-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .album-del{
+    position:absolute;top:4px;right:4px;
+    width:20px;height:20px;
+    border:none;border-radius:50%;
+    background:rgba(91,75,78,0.55);
+    color:#fff;
+    font-size:11px;
+    cursor:pointer;
+    display:none;
+    align-items:center;justify-content:center;
+  }
+  body.edit-mode .album-del{display:flex;}
+  .album-add{
+    flex:0 0 auto;
+    width:110px;height:110px;
+    border-radius:18px;
+    border:1.5px dashed var(--line);
+    background:none;
+    color:var(--text-sub);
+    font-size:24px;
+    cursor:pointer;
+    display:none;
+    align-items:center;justify-content:center;
+  }
+  body.edit-mode .album-add{display:flex;}
+  .album-empty{
+    font-size:12px;
+    color:var(--text-sub);
+    text-align:center;
+    padding:14px 0;
+  }
+
+  /* ---------- info blocks ---------- */
+  .info-block{
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:var(--shadow-soft);
+    padding:18px 20px;
+    margin-bottom:14px;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+  }
+  .info-block .icon{
+    font-size:22px;
+    flex-shrink:0;
+    width:36px;height:36px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:default;
+  }
+  body.edit-mode .info-block .icon{cursor:pointer;}
+  .icon-c0{background:rgba(255,178,166,0.25);}
+  .icon-c1{background:rgba(174,227,211,0.35);}
+  .icon-c2{background:rgba(255,226,154,0.4);}
+  .icon-c3{background:rgba(201,182,236,0.3);}
+  .info-block .body{flex:1;min-width:0;}
+  .info-block .label{
+    font-size:11px;
+    color:var(--lavender-deep);
+    font-weight:700;
+    margin-bottom:4px;
+    outline:none;
+  }
+  .info-block .value{
+    font-size:14px;
+    outline:none;
+    line-height:1.5;
+    word-break:break-word;
+  }
+  .info-block .block-controls{
+    display:none;
+    flex-direction:column;
+    gap:4px;
+    flex-shrink:0;
+  }
+  body.edit-mode .info-block .block-controls{display:flex;}
+  .block-controls button{
+    border:none;background:var(--bg-1);color:var(--text-sub);
+    width:22px;height:22px;border-radius:7px;font-size:10px;cursor:pointer;
+  }
+  .block-controls button:disabled{opacity:0.3;cursor:default;}
+  .block-controls .block-del{color:var(--coral-deep);}
+  .add-block-btn{
+    display:none;
+    width:100%;
+    border:1.5px dashed var(--line);
+    background:none;
+    color:var(--text-sub);
+    border-radius:22px;
+    padding:14px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  body.edit-mode .add-block-btn{display:block;}
+
+  /* ---------- quote ---------- */
+  .quote-block{
+    text-align:center;
+    padding:34px 10px 10px;
+  }
+  .quote-mark{
+    font-family:'Gaegu', sans-serif;
+    font-size:40px;
+    color:var(--coral);
+    line-height:0.5;
+    display:block;
+    margin-bottom:6px;
+  }
+  .quote{
+    font-family:'Gaegu', sans-serif;
+    font-size:19px;
+    color:var(--text-main);
+    outline:none;
+    line-height:1.6;
+  }
+
+  /* ---------- music / links ---------- */
   .music-frame{
-    border-radius:16px;
+    border-radius:18px;
     overflow:hidden;
     box-shadow:var(--shadow-soft);
   }
-  .music-frame iframe{display:block;width:100%;height:160px;border:none;}
+  .music-frame iframe{display:block;width:100%;height:180px;border:none;}
   .music-btn{
     margin-top:10px;
     width:100%;
     border:none;
-    background:var(--bg-2);
+    background:var(--bg-1);
     color:var(--text-main);
-    padding:9px;
+    padding:11px;
     border-radius:14px;
-    font-size:12px;
+    font-size:13px;
     font-weight:700;
     cursor:pointer;
   }
-
-  /* ---------- Todo card ---------- */
-  .tabs{display:flex;gap:6px;margin-bottom:10px;}
-  .tab-btn{
-    border:none;
-    padding:6px 14px;
-    border-radius:16px;
-    font-size:12px;
-    font-weight:700;
-    cursor:pointer;
-    background:var(--bg-2);
-    color:var(--text-sub);
-  }
-  .tab-btn.active{background:var(--mint-deep);color:#fff;}
-  .todo-input-row{display:flex;gap:6px;margin-bottom:10px;}
-  .todo-input-row input{
-    flex:1;
-    border:1.5px solid var(--line);
-    border-radius:12px;
-    padding:8px 12px;
-    font-size:13px;
-    font-family:inherit;
-    outline:none;
-  }
-  .todo-input-row input:focus{border-color:var(--mint-deep);}
-  .todo-input-row button{
-    border:none;background:var(--mint-deep);color:#fff;
-    width:34px;border-radius:12px;font-size:16px;cursor:pointer;
-  }
-  .todo-list{list-style:none;margin:0;padding:0;max-height:200px;overflow-y:auto;}
-  .todo-item{
-    display:flex;align-items:center;gap:8px;
-    padding:7px 2px;
-    border-bottom:1px solid var(--line);
-    font-size:13px;
-  }
-  .todo-item input[type=checkbox]{
-    accent-color:var(--mint-deep);
-    width:16px;height:16px;flex-shrink:0;cursor:pointer;
-  }
-  .todo-text{flex:1;word-break:break-word;}
-  .todo-item.done .todo-text{text-decoration:line-through;color:var(--text-sub);}
-  .todo-del{
-    border:none;background:none;color:var(--text-sub);
-    cursor:pointer;font-size:14px;opacity:0;transition:opacity .15s;
-  }
-  .todo-item:hover .todo-del{opacity:1;}
-  .empty-hint{color:var(--text-sub);font-size:12px;padding:10px 2px;}
-
-  /* ---------- Links card ---------- */
   .link-grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:8px;
+    gap:10px;
   }
   .link-chip{
     position:relative;
-    display:flex;flex-direction:column;align-items:center;gap:4px;
-    background:var(--bg-1);
-    border:1.5px solid var(--line);
-    border-radius:16px;
-    padding:12px 6px;
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+    background:var(--card);
+    box-shadow:var(--shadow-soft);
+    border-radius:18px;
+    padding:16px 6px;
     text-decoration:none;
     color:var(--text-main);
     font-size:11px;
@@ -336,8 +361,8 @@
     cursor:pointer;
     transition:transform .12s ease;
   }
-  .link-chip:hover{transform:translateY(-2px);border-color:var(--coral);}
-  .link-emoji{font-size:22px;}
+  .link-chip:hover{transform:translateY(-2px);}
+  .link-emoji{font-size:24px;}
   .link-del{
     position:absolute;top:2px;right:4px;
     border:none;background:none;font-size:11px;color:var(--text-sub);
@@ -348,9 +373,18 @@
     border:1.5px dashed var(--line);
     background:none;
     color:var(--text-sub);
+    box-shadow:none;
     display:none;
   }
   body.edit-mode .link-add{display:flex;}
+
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:var(--text-sub);
+    margin-top:40px;
+  }
+  @media (min-width:840px){ footer{grid-column:1 / -1;} }
 
   body.edit-mode [contenteditable="true"]{
     outline:1.5px dashed var(--coral);
@@ -358,17 +392,7 @@
     border-radius:6px;
     background:rgba(255,178,166,0.06);
   }
-  body.edit-mode .avatar::after{
-    content:'📷';
-    position:absolute;
-  }
-
-  footer{
-    text-align:center;
-    font-size:11px;
-    color:var(--text-sub);
-    margin-top:24px;
-  }
+  body.edit-mode .avatar{box-shadow:var(--shadow), 0 0 0 3px var(--coral);}
 </style>
 </head>
 <body>
@@ -376,74 +400,63 @@
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
 <div class="blob blob3"></div>
-<div class="blob blob4"></div>
+
+<header>
+  <div class="site-title" contenteditable="false" id="siteTitle">AllCotton</div>
+  <div class="header-right">
+    <div class="sync-status" id="syncStatus" title="동기화 상태">☁️</div>
+    <button class="edit-toggle" id="editToggle" title="편집 모드">✏️</button>
+  </div>
+</header>
 
 <div class="wrap">
 
-  <header>
-    <div class="site-title" contenteditable="false" id="siteTitle">AllCotton</div>
-    <div class="header-right">
-      <div class="sync-status" id="syncStatus" title="동기화 상태">☁️</div>
-      <div class="date-badge" id="dateBadge"></div>
-      <button class="edit-toggle" id="editToggle" title="편집 모드">✏️</button>
-    </div>
-  </header>
-
-  <div class="grid">
-
-    <!-- Profile flip card -->
-    <div class="card profile-outer" id="profileOuter">
-      <div class="flip-inner">
-        <div class="flip-face flip-front">
-          <div class="avatar" id="avatar" title="클릭해서 사진 바꾸기">🌱</div>
-          <input type="file" id="avatarInput" accept="image/*" style="display:none;">
-          <div class="profile-name" contenteditable="false" id="profileName">샤샤</div>
-          <div class="profile-tag" contenteditable="false" id="profileTag">🐣 소요도서관 사서</div>
-          <div class="profile-intro" contenteditable="false" id="profileIntro">오늘도 도서관에서 책과 함께 하루를 보내는 중 🌿</div>
-          <button class="flip-btn" id="flipBtn1" title="뒤집기">🔄</button>
-        </div>
-        <div class="flip-face flip-back">
-          <div class="card-title" style="font-size:15px;">ABOUT ME</div>
-          <div class="info-row"><div class="info-label">좋아하는 것</div><div class="info-value" contenteditable="false" id="info1">만들기, 문구류</div></div>
-          <div class="info-row"><div class="info-label">요즘 관심사</div><div class="info-value" contenteditable="false" id="info2">웹앱 만들기</div></div>
-          <div class="info-row"><div class="info-label">한 줄 소개</div><div class="info-value" contenteditable="false" id="info3">천천히, 그렇지만 꾸준히</div></div>
-          <div class="quote" contenteditable="false" id="quote">"오늘도 잘 살아냈다 🤍"</div>
-          <button class="flip-btn" id="flipBtn2" title="뒤집기">🔄</button>
-        </div>
-      </div>
+  <div class="sidebar">
+    <div class="hero reveal">
+      <div class="avatar" id="avatar" title="탭해서 사진 바꾸기">🌱</div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+      <div class="profile-name" contenteditable="false" id="profileName">샤샤</div>
+      <div class="profile-tag" contenteditable="false" id="profileTag">🐣 소요도서관 사서</div>
+      <div class="profile-intro" contenteditable="false" id="profileIntro">오늘도 도서관에서 책과 함께 하루를 보내는 중 🌿</div>
     </div>
 
-    <!-- Music player -->
-    <div class="card">
-      <div class="card-title">🎵 지금 듣는 노래</div>
+    <div class="quote-block reveal">
+      <span class="quote-mark">"</span>
+      <div class="quote" contenteditable="false" id="quote">오늘도 잘 살아냈다 🤍</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <div class="section reveal">
+      <div class="section-title">📷 미니 앨범</div>
+      <div class="album-strip" id="albumStrip"></div>
+      <input type="file" id="albumInput" accept="image/*" style="display:none;">
+    </div>
+
+    <div class="divider reveal">· · ·</div>
+
+    <div class="section reveal" id="infoSection">
+      <div id="infoBlocksContainer"></div>
+      <button class="add-block-btn" id="addBlockBtn">+ 항목 추가</button>
+    </div>
+
+    <div class="section reveal">
+      <div class="section-title">🎵 지금 듣는 노래</div>
       <div class="music-frame">
         <iframe id="musicFrame" src="https://www.youtube.com/embed/jfKfPfyJRdk" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
       <button class="music-btn" id="musicBtn">🎶 노래 바꾸기</button>
     </div>
 
-    <!-- Todo / wishlist -->
-    <div class="card">
-      <div class="tabs">
-        <button class="tab-btn active" data-list="todo">오늘 할 일</button>
-        <button class="tab-btn" data-list="wish">위시리스트</button>
-      </div>
-      <div class="todo-input-row">
-        <input type="text" id="todoInput" placeholder="추가하고 엔터 ⏎">
-        <button id="todoAddBtn">+</button>
-      </div>
-      <ul class="todo-list" id="todoList"></ul>
-    </div>
-
-    <!-- Links -->
-    <div class="card">
-      <div class="card-title">🔗 자주 가는 곳</div>
+    <div class="section reveal">
+      <div class="section-title">🔗 자주 가는 곳</div>
       <div class="link-grid" id="linkGrid"></div>
     </div>
 
   </div>
 
-  <footer>edit 모드(✏️)를 눌러서 자유롭게 커스텀해보세요 · made with 🤍</footer>
+  <footer>edit 모드(✏️)를 눌러서 자유롭게 커스텀해보세요</footer>
 </div>
 
 <!-- Firebase (compat SDK, no build step needed) -->
@@ -451,10 +464,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-/* ==========================================================
-   🔥 여기에 본인의 Firebase 설정값을 붙여넣어주세요
-   Firebase 콘솔 > 프로젝트 설정 > 일반 > 내 앱 > SDK 설정 및 구성
-   ========================================================== */
 const firebaseConfig = {
   apiKey: "AIzaSyAP4dInezoBrbUF7p0r1aP80pqcclg0EgQ",
   authDomain: "sometudio.firebaseapp.com",
@@ -465,13 +474,8 @@ const firebaseConfig = {
   appId: "1:861527247257:web:88cee094a9082eee12ab08"
 };
 
-/* 이 문서 하나에 대시보드 전체 데이터가 저장됩니다.
-   기기가 여러 개여도 같은 DOC_ID면 자동으로 같은 데이터를 봅니다. */
 const DOC_ID = "shasha";
-
-let db = null;
-let docRef = null;
-let isFirebaseReady = false;
+let db = null, docRef = null, isFirebaseReady = false;
 
 try{
   firebase.initializeApp(firebaseConfig);
@@ -479,29 +483,26 @@ try{
   docRef = db.collection('webhub').doc(DOC_ID);
   isFirebaseReady = true;
 }catch(e){
-  console.warn('Firebase 설정이 비어있어요. 브라우저 저장(localStorage)만 사용합니다.', e);
+  console.warn('Firebase 초기화 실패. 브라우저 저장(localStorage)만 사용합니다.', e);
 }
 
 const syncStatusEl = document.getElementById('syncStatus');
 function setSyncStatus(state){
   if(!syncStatusEl) return;
-  if(state === 'syncing'){ syncStatusEl.textContent = '☁️'; syncStatusEl.classList.add('syncing'); syncStatusEl.title = '저장 중...'; }
+  if(state === 'syncing'){ syncStatusEl.classList.add('syncing'); syncStatusEl.title = '저장 중...'; }
   else if(state === 'synced'){ syncStatusEl.textContent = '☁️'; syncStatusEl.classList.remove('syncing'); syncStatusEl.title = '동기화됨'; }
   else if(state === 'offline'){ syncStatusEl.textContent = '📴'; syncStatusEl.classList.remove('syncing'); syncStatusEl.title = 'Firebase 미설정 - 이 기기에만 저장됨'; }
   else if(state === 'error'){ syncStatusEl.textContent = '⚠️'; syncStatusEl.classList.remove('syncing'); syncStatusEl.title = '동기화 오류'; }
 }
 setSyncStatus(isFirebaseReady ? 'synced' : 'offline');
 
-/* ---------- storage helpers ---------- */
 let syncTimer = null;
-let applyingRemote = false; // guard against feedback loop while hydrating from a snapshot
+let applyingRemote = false;
 
 const store = {
   get(key, fallback){
-    try{
-      const v = localStorage.getItem(key);
-      return v === null ? fallback : JSON.parse(v);
-    }catch(e){ return fallback; }
+    try{ const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); }
+    catch(e){ return fallback; }
   },
   set(key, val){
     try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
@@ -524,7 +525,7 @@ function startCloudSync(){
   if(!isFirebaseReady) return;
   docRef.onSnapshot((snap)=>{
     if(!snap.exists) return;
-    if(snap.metadata.hasPendingWrites) return; // ignore echo of our own writes
+    if(snap.metadata.hasPendingWrites) return;
     applyingRemote = true;
     const data = snap.data();
     Object.keys(data).forEach(k=>{
@@ -533,70 +534,197 @@ function startCloudSync(){
     hydrateUI();
     applyingRemote = false;
     setSyncStatus('synced');
-  }, (err)=>{
-    console.error(err);
-    setSyncStatus('error');
+  }, (err)=>{ console.error(err); setSyncStatus('error'); });
+}
+
+/* ---------- image compression helper ---------- */
+function compressImage(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+        else if(h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
-/* ---------- date badge ---------- */
-document.getElementById('dateBadge').textContent = new Date().toLocaleDateString('ko-KR', {
-  month:'long', day:'numeric', weekday:'short'
-});
-
 /* ---------- edit mode ---------- */
-const editables = ['siteTitle','profileName','profileTag','profileIntro','info1','info2','info3','quote'];
+const editables = ['siteTitle','profileName','profileTag','profileIntro','quote'];
 const editToggle = document.getElementById('editToggle');
 let editMode = false;
-
 function applyEditState(){
   document.body.classList.toggle('edit-mode', editMode);
   editables.forEach(id=>{
     document.getElementById(id).setAttribute('contenteditable', editMode ? 'true' : 'false');
   });
   editToggle.textContent = editMode ? '✅' : '✏️';
+  renderBlocks();
+  renderAlbum();
 }
-editToggle.addEventListener('click', ()=>{
-  editMode = !editMode;
-  applyEditState();
-});
+editToggle.addEventListener('click', ()=>{ editMode = !editMode; applyEditState(); });
 editables.forEach(id=>{
   const el = document.getElementById(id);
   el.addEventListener('blur', ()=> store.set('wh_'+id, el.textContent));
 });
-/* ---------- flip card ---------- */
-const profileOuter = document.getElementById('profileOuter');
-function doFlip(e){
-  e.stopPropagation();
-  profileOuter.classList.toggle('flipped');
-}
-document.getElementById('flipBtn1').addEventListener('click', doFlip);
-document.getElementById('flipBtn2').addEventListener('click', doFlip);
 
 /* ---------- avatar photo ---------- */
 const avatar = document.getElementById('avatar');
 const avatarInput = document.getElementById('avatarInput');
 function loadAvatar(){
   const saved = store.get('wh_avatar', null);
-  if(saved){
-    avatar.style.backgroundImage = `url(${saved})`;
-    avatar.textContent = '';
-  }
+  if(saved){ avatar.style.backgroundImage = `url(${saved})`; avatar.textContent = ''; }
 }
-avatar.addEventListener('click', ()=>{
-  if(!editMode) return;
-  avatarInput.click();
-});
-avatarInput.addEventListener('change', ()=>{
+avatar.addEventListener('click', ()=>{ if(editMode) avatarInput.click(); });
+avatarInput.addEventListener('change', async ()=>{
   const file = avatarInput.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    avatar.style.backgroundImage = `url(${reader.result})`;
-    avatar.textContent = '';
-    store.set('wh_avatar', reader.result);
-  };
-  reader.readAsDataURL(file);
+  const dataUrl = await compressImage(file, 400, 0.8);
+  avatar.style.backgroundImage = `url(${dataUrl})`;
+  avatar.textContent = '';
+  store.set('wh_avatar', dataUrl);
+});
+
+/* ---------- mini album ---------- */
+const albumStrip = document.getElementById('albumStrip');
+const albumInput = document.getElementById('albumInput');
+const MAX_PHOTOS = 6;
+function getAlbum(){ return store.get('wh_album', []); }
+function setAlbum(arr){ store.set('wh_album', arr); }
+function renderAlbum(){
+  const photos = getAlbum();
+  albumStrip.innerHTML = '';
+  if(photos.length === 0 && !editMode){
+    const hint = document.createElement('div');
+    hint.className = 'album-empty';
+    hint.textContent = '아직 등록된 사진이 없어요';
+    albumStrip.appendChild(hint);
+  }
+  photos.forEach((src, idx)=>{
+    const box = document.createElement('div');
+    box.className = 'album-photo';
+    box.innerHTML = `<img src="${src}" alt="album photo"><button class="album-del" title="삭제">✕</button>`;
+    box.querySelector('.album-del').addEventListener('click', ()=>{
+      const arr = getAlbum();
+      arr.splice(idx,1);
+      setAlbum(arr);
+      renderAlbum();
+    });
+    albumStrip.appendChild(box);
+  });
+  if(editMode && photos.length < MAX_PHOTOS){
+    const addBtn = document.createElement('button');
+    addBtn.className = 'album-add';
+    addBtn.textContent = '+';
+    addBtn.title = `최대 ${MAX_PHOTOS}장까지 등록할 수 있어요`;
+    addBtn.addEventListener('click', ()=> albumInput.click());
+    albumStrip.appendChild(addBtn);
+  }
+}
+albumInput.addEventListener('change', async ()=>{
+  const file = albumInput.files[0];
+  if(!file) return;
+  const arr = getAlbum();
+  if(arr.length >= MAX_PHOTOS){ alert(`사진은 최대 ${MAX_PHOTOS}장까지만 등록할 수 있어요`); return; }
+  const dataUrl = await compressImage(file, 700, 0.72);
+  arr.push(dataUrl);
+  setAlbum(arr);
+  renderAlbum();
+  albumInput.value = '';
+});
+
+/* ---------- dynamic info blocks ---------- */
+const DEFAULT_BLOCKS = [
+  {icon:'🌸', label:'좋아하는 것', value:'만들기, 문구류'},
+  {icon:'💭', label:'요즘 관심사', value:'웹앱 만들기'},
+  {icon:'✍️', label:'한 줄 소개', value:'천천히, 그렇지만 꾸준히'}
+];
+const infoContainer = document.getElementById('infoBlocksContainer');
+function getBlocks(){ return store.get('wh_infoBlocks', DEFAULT_BLOCKS); }
+function setBlocks(arr){ store.set('wh_infoBlocks', arr); }
+
+function renderBlocks(){
+  const blocks = getBlocks();
+  infoContainer.innerHTML = '';
+  blocks.forEach((b, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'info-block';
+    div.innerHTML = `
+      <div class="icon icon-c${idx % 4}" title="탭해서 아이콘 바꾸기">${b.icon}</div>
+      <div class="body">
+        <div class="label" contenteditable="${editMode ? 'true' : 'false'}"></div>
+        <div class="value" contenteditable="${editMode ? 'true' : 'false'}"></div>
+      </div>
+      <div class="block-controls">
+        <button class="block-up" title="위로" ${idx === 0 ? 'disabled' : ''}>▲</button>
+        <button class="block-down" title="아래로" ${idx === blocks.length - 1 ? 'disabled' : ''}>▼</button>
+        <button class="block-del" title="삭제">✕</button>
+      </div>
+    `;
+    div.querySelector('.label').textContent = b.label;
+    div.querySelector('.value').textContent = b.value;
+
+    div.querySelector('.icon').addEventListener('click', ()=>{
+      if(!editMode) return;
+      const arr = getBlocks();
+      const newIcon = prompt('아이콘으로 쓸 이모지를 입력하세요', arr[idx].icon);
+      if(!newIcon) return;
+      arr[idx].icon = newIcon;
+      setBlocks(arr);
+      renderBlocks();
+    });
+    div.querySelector('.label').addEventListener('blur', (e)=>{
+      const arr = getBlocks();
+      arr[idx].label = e.target.textContent;
+      setBlocks(arr);
+    });
+    div.querySelector('.value').addEventListener('blur', (e)=>{
+      const arr = getBlocks();
+      arr[idx].value = e.target.textContent;
+      setBlocks(arr);
+    });
+    div.querySelector('.block-up').addEventListener('click', ()=>{
+      const arr = getBlocks();
+      if(idx === 0) return;
+      [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]];
+      setBlocks(arr);
+      renderBlocks();
+    });
+    div.querySelector('.block-down').addEventListener('click', ()=>{
+      const arr = getBlocks();
+      if(idx === arr.length - 1) return;
+      [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]];
+      setBlocks(arr);
+      renderBlocks();
+    });
+    div.querySelector('.block-del').addEventListener('click', ()=>{
+      const arr = getBlocks();
+      arr.splice(idx,1);
+      setBlocks(arr);
+      renderBlocks();
+    });
+    infoContainer.appendChild(div);
+  });
+}
+document.getElementById('addBlockBtn').addEventListener('click', ()=>{
+  const label = prompt('항목 이름을 입력하세요 (예: 좋아하는 계절)');
+  if(!label) return;
+  const icon = prompt('아이콘으로 쓸 이모지를 입력하세요', '🌿') || '🌿';
+  const arr = getBlocks();
+  arr.push({icon, label, value:'내용을 입력해주세요'});
+  setBlocks(arr);
+  renderBlocks();
 });
 
 /* ---------- music ---------- */
@@ -618,69 +746,6 @@ document.getElementById('musicBtn').addEventListener('click', ()=>{
   store.set('wh_musicId', id);
 });
 
-/* ---------- todo / wishlist ---------- */
-let currentList = 'todo';
-const todoListEl = document.getElementById('todoList');
-const todoInput = document.getElementById('todoInput');
-const tabBtns = document.querySelectorAll('.tab-btn');
-
-function getItems(listName){ return store.get('wh_list_'+listName, []); }
-function setItems(listName, items){ store.set('wh_list_'+listName, items); }
-
-function renderList(){
-  const items = getItems(currentList);
-  todoListEl.innerHTML = '';
-  if(items.length === 0){
-    const hint = document.createElement('div');
-    hint.className = 'empty-hint';
-    hint.textContent = currentList === 'todo' ? '오늘 할 일을 추가해보세요 🌱' : '갖고 싶은 걸 적어보세요 ✨';
-    todoListEl.appendChild(hint);
-    return;
-  }
-  items.forEach((item, idx)=>{
-    const li = document.createElement('li');
-    li.className = 'todo-item' + (item.done ? ' done' : '');
-    li.innerHTML = `
-      <input type="checkbox" ${item.done ? 'checked' : ''}>
-      <span class="todo-text"></span>
-      <button class="todo-del" title="삭제">✕</button>
-    `;
-    li.querySelector('.todo-text').textContent = item.text;
-    li.querySelector('input[type=checkbox]').addEventListener('change', ()=>{
-      const arr = getItems(currentList);
-      arr[idx].done = !arr[idx].done;
-      setItems(currentList, arr);
-      renderList();
-    });
-    li.querySelector('.todo-del').addEventListener('click', ()=>{
-      const arr = getItems(currentList);
-      arr.splice(idx,1);
-      setItems(currentList, arr);
-      renderList();
-    });
-    todoListEl.appendChild(li);
-  });
-}
-function addItem(){
-  const text = todoInput.value.trim();
-  if(!text) return;
-  const arr = getItems(currentList);
-  arr.push({text, done:false});
-  setItems(currentList, arr);
-  todoInput.value = '';
-  renderList();
-}
-document.getElementById('todoAddBtn').addEventListener('click', addItem);
-todoInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') addItem(); });
-tabBtns.forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    tabBtns.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    currentList = btn.dataset.list;
-    renderList();
-  });
-});
-
 /* ---------- links ---------- */
 const linkGrid = document.getElementById('linkGrid');
 const defaultLinks = [
@@ -690,7 +755,6 @@ const defaultLinks = [
 ];
 function getLinks(){ return store.get('wh_links', defaultLinks); }
 function setLinks(links){ store.set('wh_links', links); }
-
 function renderLinks(){
   const links = getLinks();
   linkGrid.innerHTML = '';
@@ -731,7 +795,25 @@ function renderLinks(){
   linkGrid.appendChild(addBtn);
 }
 
-/* ---------- hydrate everything from current storage ---------- */
+/* ---------- scroll reveal ---------- */
+function setupReveal(){
+  const items = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    items.forEach(el=> el.classList.add('in-view'));
+    return;
+  }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.12 });
+  items.forEach(el=> io.observe(el));
+}
+
+/* ---------- hydrate ---------- */
 function hydrateUI(){
   editables.forEach(id=>{
     const el = document.getElementById(id);
@@ -740,12 +822,13 @@ function hydrateUI(){
   });
   loadAvatar();
   loadMusic();
-  renderList();
   renderLinks();
+  renderBlocks();
+  renderAlbum();
 }
-
 hydrateUI();
 startCloudSync();
+setupReveal();
 </script>
 </body>
 </html>
