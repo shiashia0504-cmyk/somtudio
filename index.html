@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOMtudio</title>
+<title>내 작은 방</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -31,10 +31,7 @@
     min-height:100vh;
     font-family:'Noto Sans KR', sans-serif;
     color:var(--text-main);
-    background:
-      radial-gradient(circle at 15% 10%, var(--bg-2), transparent 45%),
-      radial-gradient(circle at 85% 90%, var(--bg-2), transparent 45%),
-      var(--bg-1);
+    background:#ffffff;
     overflow-x:hidden;
     -webkit-tap-highlight-color:transparent;
   }
@@ -42,7 +39,7 @@
     position:fixed;
     border-radius:50%;
     filter:blur(2px);
-    opacity:0.5;
+    opacity:0.35;
     z-index:0;
     animation:float 14s ease-in-out infinite;
   }
@@ -74,9 +71,11 @@
   }
   .site-title{
     font-family:'Gaegu', sans-serif;
-    font-size:30px;
+    font-size:14px;
     font-weight:700;
-    color:var(--text-main);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--text-sub);
     outline:none;
   }
   .date-badge{
@@ -120,7 +119,6 @@
   }
   @media (max-width:640px){
     .grid{grid-template-columns:1fr;}
-    .site-title{font-size:24px;}
   }
 
   .card{
@@ -383,7 +381,7 @@
 <div class="wrap">
 
   <header>
-    <div class="site-title" contenteditable="false" id="siteTitle">내 작은 방 🌿</div>
+    <div class="site-title" contenteditable="false" id="siteTitle">AllCotton</div>
     <div class="header-right">
       <div class="sync-status" id="syncStatus" title="동기화 상태">☁️</div>
       <div class="date-badge" id="dateBadge"></div>
@@ -458,13 +456,12 @@
    Firebase 콘솔 > 프로젝트 설정 > 일반 > 내 앱 > SDK 설정 및 구성
    ========================================================== */
 const firebaseConfig = {
-  apiKey: "AIzaSyAP4dInezoBrbUF7p0r1aP80pqcclg0EgQ",
-  authDomain: "sometudio.firebaseapp.com",
-  databaseURL: "https://sometudio-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "sometudio",
-  storageBucket: "sometudio.firebasestorage.app",
-  messagingSenderId: "861527247257",
-  appId: "1:861527247257:web:88cee094a9082eee12ab08"
+  apiKey: "여기에_입력",
+  authDomain: "여기에_입력",
+  projectId: "여기에_입력",
+  storageBucket: "여기에_입력",
+  messagingSenderId: "여기에_입력",
+  appId: "여기에_입력"
 };
 
 /* 이 문서 하나에 대시보드 전체 데이터가 저장됩니다.
