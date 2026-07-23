@@ -187,6 +187,41 @@
   }
   body.edit-mode .add-row-btn{display:block;}
 
+  /* ---------- certification pills ---------- */
+  .cert-pills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .cert-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+    cursor:default;
+  }
+  body.edit-mode .cert-pill{cursor:pointer;}
+  .cert-pill.official{
+    background:var(--blue-deep);
+    color:#fff;
+  }
+  .cert-pill.unofficial{
+    background:rgba(217,102,143,0.15);
+    color:var(--blue-deep);
+  }
+  .cert-pill .cert-del{
+    border:none;background:none;padding:0;
+    color:inherit;
+    opacity:0.7;
+    font-size:10px;
+    cursor:pointer;
+    display:none;
+  }
+  body.edit-mode .cert-pill .cert-del{display:inline;}
+
   /* ---------- status segments ---------- */
   .status-segments{display:flex; gap:4px; margin-top:2px;}
   .status-seg{
@@ -349,6 +384,13 @@
           <div class="status-segments" id="statusSegments"></div>
         </div>
 
+        <div class="row">
+          <div class="row-label">Certs</div>
+          <div class="row-colon">:</div>
+          <div class="cert-pills" id="certPills"></div>
+        </div>
+        <button class="add-row-btn" id="addCertBtn">+ 자격증 추가</button>
+
         <hr class="divider-line">
         <div id="linkRows"></div>
         <button class="link-row add-link-row" id="addLinkRow">+ 링크 추가</button>
@@ -486,6 +528,7 @@ function applyEditState(){
   renderAlbum();
   renderLinkRows();
   renderStatus();
+  renderCerts();
 }
 editToggle.addEventListener('click', ()=>{ editMode = !editMode; applyEditState(); });
 editables.forEach(id=>{
@@ -566,6 +609,36 @@ function renderStatus(){
     statusEl.appendChild(seg);
   }
 }
+
+/* ---------- certifications ---------- */
+const certPillsEl = document.getElementById('certPills');
+function getCerts(){ return store.get('wh_certs', []); }
+function setCerts(arr){ store.set('wh_certs', arr); }
+function renderCerts(){
+  const certs = getCerts();
+  certPillsEl.innerHTML = '';
+  certs.forEach((c, idx)=>{
+    const pill = document.createElement('div');
+    pill.className = 'cert-pill ' + (c.official ? 'official' : 'unofficial');
+    pill.innerHTML = `<span></span><button class="cert-del">✕</button>`;
+    pill.querySelector('span').textContent = c.name;
+    pill.querySelector('span').addEventListener('click', ()=>{
+      if(!editMode) return;
+      const arr = getCerts(); arr[idx].official = !arr[idx].official; setCerts(arr); renderCerts();
+    });
+    pill.querySelector('.cert-del').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const arr = getCerts(); arr.splice(idx,1); setCerts(arr); renderCerts();
+    });
+    certPillsEl.appendChild(pill);
+  });
+}
+document.getElementById('addCertBtn').addEventListener('click', ()=>{
+  const name = prompt('자격증 이름을 입력하세요 (예: 사서교사 2급)');
+  if(!name) return;
+  const official = confirm('정식 자격증인가요?\n확인 = 정식(진하게) / 취소 = 비공식(연하게)');
+  const arr = getCerts(); arr.push({name, official}); setCerts(arr); renderCerts();
+});
 
 /* ---------- link rows ---------- */
 const linkRowsEl = document.getElementById('linkRows');
@@ -668,6 +741,7 @@ function hydrateUI(){
   loadMusic();
   renderRows();
   renderStatus();
+  renderCerts();
   renderLinkRows();
   renderAlbum();
 }
